@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration version="1.0.6.12">
+  <General>
+    <HarmonyPath path="../../../microchip/harmony/v1_06"/>
+    <ForceOptimization flag="true"/>
+  </General>
+  <Manifest>
+    <Files>
+      <File>
+        <Name>sys_module.h</Name>
+        <Path>Header Files/framework/system/common</Path>
+      </File>
+      <File>
+        <Name>drv_spi_sys_queue.h</Name>
+        <Path>Header Files/framework/driver/spi/private</Path>
+      </File>
+      <File>
+        <Name>bsp_config.h</Name>
+        <Path>Header Files/bsp/pic32mx_usb_sk2</Path>
+      </File>
+      <File>
+        <Name>sys_dma.h</Name>
+        <Path>Header Files/framework/system/dma</Path>
+      </File>
+      <File>
+        <Name>sys_int.h</Name>
+        <Path>Header Files/framework/system/int</Path>
+      </File>
+      <File>
+        <Name>sys_common.h</Name>
+        <Path>Header Files/framework/system/common</Path>
+      </File>
+      <File>
+        <Name>drv_tmr.h</Name>
+        <Path>Header Files/framework/driver/tmr</Path>
+      </File>
+      <File>
+        <Name>system.h</Name>
+        <Path>Header Files/framework/system</Path>
+      </File>
+      <File>
+        <Name>sys_ports.c</Name>
+        <Path>Source Files/framework/system/ports/src</Path>
+      </File>
+      <File>
+        <Name>drv_spi_internal.h</Name>
+        <Path>Header Files/framework/driver/spi/private/dynamic</Path>
+      </File>
+      <File>
+        <Name>drv_spi.c</Name>
+        <Path>Source Files/framework/driver/spi/dynamic</Path>
+      </File>
+      <File>
+        <Name>drv_spi_api.c</Name>
+        <Path>Source Files/framework/driver/spi/dynamic</Path>
+      </File>
+      <File>
+        <Name>sys_dma.c</Name>
+        <Path>Source Files/framework/system/dma</Path>
+      </File>
+      <File>
+        <Name>drv_spi_sys_queue_fifo.c</Name>
+        <Path>Source Files/framework/driver/spi</Path>
+      </File>
+      <File>
+        <Name>bsp_sys_init.c</Name>
+        <Path>Source Files/bsp/pic32mx_usb_sk2</Path>
+      </File>
+      <File>
+        <Name>driver.h</Name>
+        <Path>Header Files/framework/driver</Path>
+      </File>
+      <File>
+        <Name>sys_devcon.c</Name>
+        <Path>Source Files/framework/system/devcon/src</Path>
+      </File>
+      <File>
+        <Name>drv_spi_sys_queue_local_fifo.h</Name>
+        <Path>Header Files/framework/driver/spi/private</Path>
+      </File>
+      <File>
+        <Name>drv_spi.h</Name>
+        <Path>Header Files/framework/driver/spi</Path>
+      </File>
+      <File>
+        <Name>sys_ports.h</Name>
+        <Path>Header Files/framework/system/ports</Path>
+      </File>
+      <File>
+        <Name>sys_int_pic32.c</Name>
+        <Path>Source Files/framework/system/int/src</Path>
+      </File>
+      <File>
+        <Name>sys_devcon.h</Name>
+        <Path>Header Files/framework/system/devcon</Path>
+      </File>
+      <File>
+        <Name>sys_devcon_pic32mx.c</Name>
+        <Path>Source Files/framework/system/devcon/src</Path>
+      </File>
+      <File>
+        <Name>drv_tmr.c</Name>
+        <Path>Source Files/framework/driver/tmr/src/dynamic</Path>
+      </File>
+    </Files>
+    <Templates>
+      <Template>
+        <Name>main.c</Name>
+        <Path>Source Files/app</Path>
+      </Template>
+      <Template>
+        <Name>sys_clk_static.h</Name>
+        <Path>Header Files/app/system_config/PIC32_USB_SK/framework/system/clk</Path>
+        <Checksum>999179DADE9ECD59953526F5E9F83ACC</Checksum>
+      </Template>
+      <Template>
+        <Name>system_tasks.c</Name>
+        <Path>Source Files/app/system_config/PIC32_USB_SK</Path>
+        <Checksum>2C7FD6A67A59AF27788CA9BE525CE331</Checksum>
+      </Template>
+      <Template>
+        <Name>system_exceptions.c</Name>
+        <Path>Source Files/app/system_config/PIC32_USB_SK</Path>
+        <Checksum>C111969CA43D6CEA1E9E33A6164E7AE0</Checksum>
+      </Template>
+      <Template>
+        <Name>LEDScroller.c</Name>
+        <Path>Source Files/app</Path>
+      </Template>
+      <Template>
+        <Name>drv_spi_tasks.c</Name>
+        <Path>Source Files/app/system_config/PIC32_USB_SK/framework/driver/spi/dynamic</Path>
+        <Checksum>39B24F2B98C683B61BC0F89BB8D46D09</Checksum>
+      </Template>
+      <Template>
+        <Name>drv_spi_master_rm_tasks.c</Name>
+        <Path>Source Files/app/system_config/PIC32_USB_SK/framework/driver/spi/dynamic</Path>
+        <Checksum>B1D418CCAD5461556F1B671D88C9399F</Checksum>
+      </Template>
+      <Template>
+        <Name>system_init.c</Name>
+        <Path>Source Files/app/system_config/PIC32_USB_SK</Path>
+        <Checksum>7882C7343FBB43B259AEA4DB24928450</Checksum>
+      </Template>
+      <Template>
+        <Name>drv_spi_master_dma_tasks.c</Name>
+        <Path>Source Files/app/system_config/PIC32_USB_SK/framework/driver/spi/dynamic</Path>
+        <Checksum>9FAF188AFC3BED4FC34B61D2222C6057</Checksum>
+      </Template>
+      <Template>
+        <Name>LEDScroller.h</Name>
+        <Path>Header Files/app</Path>
+      </Template>
+      <Template>
+        <Name>system_interrupt.c</Name>
+        <Path>Source Files/app/system_config/PIC32_USB_SK</Path>
+        <Checksum>7F4629770663663EA27BA43006174632</Checksum>
+      </Template>
+      <Template>
+        <Name>sys_clk_static.c</Name>
+        <Path>Source Files/app/system_config/PIC32_USB_SK/framework/system/clk/src</Path>
+        <Checksum>1B968DA82B5DD869A6119C3B7628D753</Checksum>
+      </Template>
+      <Template>
+        <Name>system_definitions.h</Name>
+        <Path>Header Files/app/system_config/PIC32_USB_SK</Path>
+        <Checksum>74453D283801D3E384F21B0DB21E6BBA</Checksum>
+      </Template>
+      <Template>
+        <Name>system_config.h</Name>
+        <Path>Header Files/app/system_config/PIC32_USB_SK</Path>
+        <Checksum>C3E30C4E30462194A745BB294674B582</Checksum>
+      </Template>
+      <Template>
+        <Name>sys_ports_static.c</Name>
+        <Path>Source Files/app/system_config/PIC32_USB_SK/framework/system/ports/src</Path>
+        <Checksum>9285B6A1FA58BCB32BF9519086AC0E21</Checksum>
+      </Template>
+    </Templates>
+    <CompilerItems>
+      <C32>
+        <Include value="../../../../../microchip/harmony/v1_06/bsp/pic32mx_usb_sk2"/>
+      </C32>
+    </CompilerItems>
+    <Libraries>
+      <Library value="../../../../../microchip/harmony/v1_06/bin/framework/peripheral/PIC32MX795F512L_peripherals.a"/>
+    </Libraries>
+  </Manifest>
+</configuration>
