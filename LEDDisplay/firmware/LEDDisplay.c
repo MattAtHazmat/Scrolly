@@ -123,7 +123,7 @@ bool InitializeLEDDisplay(DISPLAY_TYPE *pDisplay)
         uint8_t index;
         uint8_t sampleString[DISPLAY_STRING_LENGTH];
         for(index=0,character=ASCII_OFFSET;
-            (character<=MAX_DEFINED_CHARACTER)&&(index<(DISPLAY_STRING_LENGTH-1));
+            (character<=MAX_DEFINED_CHARACTER)&&(index<=(DISPLAY_STRING_LENGTH));
              character++,index++)
         {
             sampleString[index]=character;

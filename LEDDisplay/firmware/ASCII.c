@@ -75,11 +75,114 @@
 #include "system_config.h"
 #include "system_definitions.h"
 #include <ASCII.h>
-CHARACTER_WIDTH_ARRAY asciiWidthTable[ASCII_CHARACTERS];
 
+#ifdef CALCULATE_CHARACTER_WIDTH
+CHARACTER_WIDTH_TYPE asciiWidthTable[ASCII_CHARACTERS];
+#else
+uint8_t asciiWidthTable[ASCII_CHARACTERS] = {
+0x31,
+0x41,
+0x50,
+0x50,
+0x50,
+0x50,
+0x50,
+0x20,
+0x41,
+0x41,
+0x50,
+0x50,
+0x31,
+0x40,
+0x31,
+0x40,
+0x50,
+0x41,
+0x50,
+0x50,
+0x50,
+0x50,
+0x50,
+0x50,
+0x50,
+0x50,
+0x31,
+0x31,
+0x51,
+0x50,
+0x40,
+0x50,
+0x50,
+0x50,
+0x50,
+0x50,
+0x50,
+0x50,
+0x50,
+0x50,
+0x50,
+0x41,
+0x50,
+0x50,
+0x50,
+0x50,
+0x50,
+0x50,
+0x50,
+0x50,
+0x50,
+0x50,
+0x50,
+0x50,
+0x50,
+0x50,
+0x50,
+0x50,
+0x50,
+0x41,
+0x51,
+0x41,
+0x50,
+0x50,
+0x31,
+0x40,
+0x51,
+0x40,
+0x51,
+0x40,
+0x40,
+0x40,
+0x40,
+0x41,
+0x51,
+0x41,
+0x41,
+0x50,
+0x40,
+0x40,
+0x51,
+0x40,
+0x40,
+0x40,
+0x40,
+0x40,
+0x50,
+0x50,
+0x50,
+0x40,
+0x41,
+0x41,
+0x32,
+0x41,
+0x50,
+0x41,
+0x50
+};
+
+#endif
 uint8_t asciiBitmap[97][5] = {
     0x00, 0x00, 0x00, 0x00, 0x00, /* ASCII 32 (0x20), character: ' ' */
-    0x00, 0xFB, 0xFB, 0x00, 0x00, /* ASCII 33 (0x21), character: '!' */
+    0x00, 0x60, 0xFA, 0x60, 0x00, /* ASCII 33 (0x21), character: '!' */
     0x20, 0xC0, 0x00, 0x20, 0xC0, /* ASCII 34 (0x22), character: '"' */
     0x28, 0x7C, 0x28, 0x7C, 0x28, /* ASCII 35 (0x23), character: '#' */
     0x24, 0x54, 0xFE, 0x54, 0x48, /* ASCII 36 (0x24), character: '$' */
@@ -179,6 +282,7 @@ uint8_t asciiBitmap[97][5] = {
 
 
 
+
 /******************************************************************************/
 
 bool GetASCIIBit(uint8_t character, bool displayDirection,uint8_t row, uint8_t column)
@@ -187,7 +291,7 @@ bool GetASCIIBit(uint8_t character, bool displayDirection,uint8_t row, uint8_t c
     characterArrayOffset = character - ASCII_OFFSET;
     if((column < CHARACTER_WIDTH_COLUMNS) &&
        (characterArrayOffset>0) &&
-       (characterArrayOffset<MAX_DEFINED_CHARACTER-ASCII_OFFSET))
+       (characterArrayOffset<=MAX_DEFINED_CHARACTER-ASCII_OFFSET))
     {
         if(displayDirection)
         {
@@ -229,19 +333,12 @@ uint32_t GetCharacterWidth(uint8_t character,bool isProportional)
         /* illegal character- not sure, just return the max. */
         return CHARACTER_WIDTH_COLUMNS;
     }
-    return (asciiWidthTable[character-ASCII_OFFSET].end - 
-            asciiWidthTable[character-ASCII_OFFSET].start);
+    return (((CHARACTER_WIDTH_TYPE)(asciiWidthTable[character-ASCII_OFFSET])).end - 
+            ((CHARACTER_WIDTH_TYPE)(asciiWidthTable[character-ASCII_OFFSET])).start);
 }
 
 /******************************************************************************/
-
-//uint32_t CharacterIndexToColumn(uint8_t characterIndex, uint8_t *message)
-//{
-//    
-//}
-
-/******************************************************************************/
-
+#ifdef CALCULATE_CHARACTER_WIDTH
 bool MakeWidthTable(void)
 {
     uint32_t character;
@@ -295,7 +392,7 @@ bool MakeWidthTable(void)
     }
     return true;
 }
-
+#endif
 /******************************************************************************/
 
 uint8_t GetCharacterStart(uint8_t character, bool isProportional)
@@ -306,7 +403,7 @@ uint8_t GetCharacterStart(uint8_t character, bool isProportional)
     }
     if(isProportional)
     {
-        return asciiWidthTable[character-ASCII_OFFSET].start;
+        return ((CHARACTER_WIDTH_TYPE)(asciiWidthTable[character-ASCII_OFFSET])).start;
     }
     else
     {
@@ -324,7 +421,7 @@ uint8_t GetCharacterEnd(uint8_t character, bool isProportional)
     }
     if(isProportional)
     {
-        return asciiWidthTable[character-ASCII_OFFSET].end;
+        return ((CHARACTER_WIDTH_TYPE)(asciiWidthTable[character-ASCII_OFFSET])).end;
     }
     else
     {

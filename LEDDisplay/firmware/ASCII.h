@@ -70,7 +70,7 @@
 #ifndef ASCII_H
 #define	ASCII_H
 /******************************************************************************/
-
+//#define CALCULATE_CHARACTER_WIDTH
 #define KERNING                     (1)
 #define ASCII_OFFSET                (0x20)
 #define CHARACTER_WIDTH_COLUMNS     (0x05)
@@ -85,15 +85,18 @@ typedef union {
         unsigned start:4;
         unsigned end:4;
     };
-} CHARACTER_WIDTH_ARRAY;
+} CHARACTER_WIDTH_TYPE;
 
 /******************************************************************************/
 /* Prototypes                                                                 */
 
 bool GetASCIIBit(uint8_t,bool, uint8_t, uint8_t);
 uint32_t GetMessageColumnWidth(uint8_t *message,bool isProportional);
-//uint32_t CharacterIndexToColumn(uint8_t characterIndex, uint8_t *message);
+#ifdef CALCULATE_CHARACTER_WIDTH
 bool MakeWidthTable(void);
+#else
+#define MakeWidthTable()    true
+#endif
 uint32_t GetCharacterWidth(uint8_t character,bool isProportional);
 uint8_t GetCharacterStart(uint8_t character, bool isProportional);
 uint8_t GetCharacterEnd(uint8_t character, bool isProportional);
