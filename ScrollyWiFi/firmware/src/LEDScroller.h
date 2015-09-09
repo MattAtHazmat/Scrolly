@@ -60,13 +60,6 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_definitions.h"
 #include "color.h"
 #include "LEDDisplay.h"
-// DOM-IGNORE-BEGIN
-#ifdef __cplusplus  // Provide C++ Compatibility
-
-extern "C" {
-
-#endif
-// DOM-IGNORE-END 
 
 // *****************************************************************************
 // *****************************************************************************
@@ -214,12 +207,6 @@ void LEDSCROLLER_Tasks( void );
 
 
 #endif /* _LEDSCROLLER_H */
-
-//DOM-IGNORE-BEGIN
-#ifdef __cplusplus
-}
-#endif
-//DOM-IGNORE-END
 
 /*******************************************************************************
  End of File

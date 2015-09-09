@@ -561,8 +561,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define BSP_OSC_FREQUENCY 8000000
 
 
-
-
+#include "FirmwareConfiguration.h"
+#include "HardwareConfiguration.h"
 
 
 #endif // _SYSTEM_CONFIG_H

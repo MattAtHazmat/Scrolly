@@ -166,6 +166,14 @@
           <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/tcpip_ethernet.h</itemPath>
         </logicalFolder>
       </logicalFolder>
+      <itemPath>../../drv_spi_internal.h</itemPath>
+      <itemPath>../../FirmwareConfiguration.h</itemPath>
+      <itemPath>../../HardwareConfiguration.h</itemPath>
+      <itemPath>../../TM1804.h</itemPath>
+      <itemPath>../../WS2812.h</itemPath>
+      <itemPath>../../color.h</itemPath>
+      <itemPath>../../ASCII.h</itemPath>
+      <itemPath>../../LEDDisplay.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -361,6 +369,9 @@
           </logicalFolder>
         </logicalFolder>
       </logicalFolder>
+      <itemPath>../../ASCII.c</itemPath>
+      <itemPath>../../LEDDisplay.c</itemPath>
+      <itemPath>../../color.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -369,7 +380,6 @@
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
-    <Elem>../src</Elem>
     <Elem>../../../../../microchip/harmony/v1_06/bsp/wifi_g_db</Elem>
     <Elem>../../../../../microchip/harmony/v1_06/framework/system/common</Elem>
     <Elem>../../../../../microchip/harmony/v1_06/framework/tcpip</Elem>
@@ -391,12 +401,9 @@
     <Elem>../../../../../microchip/harmony/v1_06/framework/driver/tmr</Elem>
     <Elem>../../../../../microchip/harmony/v1_06/framework/system/tmr</Elem>
     <Elem>../../../../../microchip/harmony/v1_06/framework/system/dma/src</Elem>
-    <Elem>../src/system_config/wifi_g_db</Elem>
-    <Elem>../src/system_config/pic32mx_eth_sk+ioexp</Elem>
-    <Elem>../src/system_config/pic32mz_ec_sk+meb2</Elem>
-    <Elem>../src/system_config/pic32mz_ec_sk+ioexp</Elem>
     <Elem>../../../../../microchip/harmony/v1_06/framework/crypto/src</Elem>
     <Elem>../../../microchip/harmony/v1_06</Elem>
+    <Elem>../..</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -442,7 +449,7 @@
         <property key="enable-unroll-loops" value="false"/>
         <property key="exclude-floating-point" value="false"/>
         <property key="extra-include-directories"
-                  value="../src;../src/system_config/wifi_g_db;../src/system_config/wifi_g_db/framework;../../../../../microchip/harmony/v1_06/framework;../../../../../microchip/harmony/v1_06/bsp/wifi_g_db"/>
+                  value="..;../..;../src;../src/system_config/wifi_g_db;../src/system_config/wifi_g_db/framework;../../../../../microchip/harmony/v1_06/framework;../../../../../microchip/harmony/v1_06/bsp/wifi_g_db"/>
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="true"/>
@@ -589,7 +596,6 @@
         <property key="UART5" value="true"/>
         <property key="UART6" value="true"/>
         <property key="debugoptions.useswbreakpoints" value="false"/>
-        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="false"/>
