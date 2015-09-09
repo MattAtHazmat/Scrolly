@@ -55,3 +55,5 @@ ScrollyWiFi/firmware/wifi_g_demo.X/funclist
 ScrollyWiFi/firmware/wifi_g_demo.X/nbproject/Makefile-*
 ScrollyWiFi/firmware/wifi_g_demo.X/disassembly/
 *.map
+
+private.h

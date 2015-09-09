@@ -34,22 +34,10 @@
           <itemPath>../../../../../microchip/harmony/v1_06/framework/crypto/crypto.h</itemPath>
         </logicalFolder>
         <logicalFolder name="f2" displayName="driver" projectFiles="true">
-          <logicalFolder name="f1" displayName="ethmac" projectFiles="true">
-            <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/ethmac/drv_ethmac.h</itemPath>
-            <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/ethmac/src/drv_ethmac_local.h</itemPath>
-            <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/ethmac/src/dynamic/_eth_dcpt_lists.h</itemPath>
-            <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/ethmac/src/dynamic/drv_ethmac_lib.h</itemPath>
-          </logicalFolder>
-          <logicalFolder name="f2" displayName="ethphy" projectFiles="true">
-            <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/ethphy/drv_ethphy.h</itemPath>
-            <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/ethphy/src/drv_ethphy_local.h</itemPath>
-            <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/ethphy/src/dynamic/drv_extphy_regs.h</itemPath>
-            <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/ethphy/src/dynamic/drv_extphy_dp83848.h</itemPath>
-          </logicalFolder>
-          <logicalFolder name="f3" displayName="nvm" projectFiles="true">
+          <logicalFolder name="f1" displayName="nvm" projectFiles="true">
             <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/nvm/drv_nvm.h</itemPath>
           </logicalFolder>
-          <logicalFolder name="f4" displayName="spi" projectFiles="true">
+          <logicalFolder name="f2" displayName="spi" projectFiles="true">
             <logicalFolder name="f1" displayName="private" projectFiles="true">
               <logicalFolder name="f1" displayName="dynamic" projectFiles="true">
                 <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/spi/src/dynamic/drv_spi_internal.h</itemPath>
@@ -59,10 +47,10 @@
             </logicalFolder>
             <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/spi/drv_spi.h</itemPath>
           </logicalFolder>
-          <logicalFolder name="f5" displayName="tmr" projectFiles="true">
+          <logicalFolder name="f3" displayName="tmr" projectFiles="true">
             <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/tmr/drv_tmr.h</itemPath>
           </logicalFolder>
-          <logicalFolder name="f6" displayName="wifi" projectFiles="true">
+          <logicalFolder name="f4" displayName="wifi" projectFiles="true">
             <logicalFolder name="f1" displayName="mrf24w" projectFiles="true">
               <logicalFolder name="f1" displayName="src" projectFiles="true">
                 <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/wifi/mrf24w/src/drv_wifi_commands.h</itemPath>
@@ -138,11 +126,6 @@
             <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/src/http_manager.h</itemPath>
             <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/src/http_private.h</itemPath>
             <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/src/icmp_manager.h</itemPath>
-            <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/src/nbns_manager.h</itemPath>
-            <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/src/zero_conf_helper.h</itemPath>
-            <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/src/zero_conf_link_local_private.h</itemPath>
-            <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/src/zero_conf_manager.h</itemPath>
-            <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/src/tcpip_announce_manager.h</itemPath>
             <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/src/hash_fnv.h</itemPath>
             <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/src/link_list.h</itemPath>
             <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/src/oahash.h</itemPath>
@@ -167,9 +150,6 @@
           <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/dnss.h</itemPath>
           <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/http.h</itemPath>
           <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/icmp.h</itemPath>
-          <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/nbns.h</itemPath>
-          <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/zero_conf_link_local.h</itemPath>
-          <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/zero_conf_multicast_dns.h</itemPath>
           <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/tcpip_helpers.h</itemPath>
           <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/tcpip_manager.h</itemPath>
           <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/tcpip.h</itemPath>
@@ -234,20 +214,12 @@
         <logicalFolder name="f1" displayName="crypto" projectFiles="true">
           <logicalFolder name="f1" displayName="src" projectFiles="true">
             <itemPath>../../../../../microchip/harmony/v1_06/framework/crypto/src/random.c</itemPath>
-            <itemPath>../../../../../microchip/harmony/v1_06/framework/crypto/src/crypto.c</itemPath>
             <itemPath>../../../../../microchip/harmony/v1_06/framework/crypto/src/arc4.c</itemPath>
+            <itemPath>../../../../../microchip/harmony/v1_06/framework/crypto/src/crypto.c</itemPath>
           </logicalFolder>
         </logicalFolder>
         <logicalFolder name="f2" displayName="driver" projectFiles="true">
-          <logicalFolder name="f1" displayName="ethmac" projectFiles="true">
-            <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/ethmac/src/dynamic/drv_ethmac.c</itemPath>
-            <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/ethmac/src/dynamic/drv_ethmac_lib.c</itemPath>
-          </logicalFolder>
-          <logicalFolder name="f2" displayName="ethphy" projectFiles="true">
-            <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/ethphy/src/dynamic/drv_ethphy.c</itemPath>
-            <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/ethphy/src/dynamic/drv_extphy_dp83848.c</itemPath>
-          </logicalFolder>
-          <logicalFolder name="f3" displayName="nvm" projectFiles="true">
+          <logicalFolder name="f1" displayName="nvm" projectFiles="true">
             <logicalFolder name="f1" displayName="src" projectFiles="true">
               <logicalFolder name="f1" displayName="dynamic" projectFiles="true">
                 <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/nvm/src/dynamic/drv_nvm.c</itemPath>
@@ -255,21 +227,21 @@
               </logicalFolder>
             </logicalFolder>
           </logicalFolder>
-          <logicalFolder name="f4" displayName="spi" projectFiles="true">
+          <logicalFolder name="f2" displayName="spi" projectFiles="true">
             <logicalFolder name="f1" displayName="dynamic" projectFiles="true">
               <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/spi/src/dynamic/drv_spi.c</itemPath>
               <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/spi/src/dynamic/drv_spi_api.c</itemPath>
             </logicalFolder>
             <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/spi/src/drv_spi_sys_queue_fifo.c</itemPath>
           </logicalFolder>
-          <logicalFolder name="f5" displayName="tmr" projectFiles="true">
+          <logicalFolder name="f3" displayName="tmr" projectFiles="true">
             <logicalFolder name="f1" displayName="src" projectFiles="true">
               <logicalFolder name="f1" displayName="dynamic" projectFiles="true">
                 <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/tmr/src/dynamic/drv_tmr.c</itemPath>
               </logicalFolder>
             </logicalFolder>
           </logicalFolder>
-          <logicalFolder name="f6" displayName="wifi" projectFiles="true">
+          <logicalFolder name="f4" displayName="wifi" projectFiles="true">
             <logicalFolder name="f1" displayName="mrf24w" projectFiles="true">
               <logicalFolder name="f1" displayName="src" projectFiles="true">
                 <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/wifi/mrf24w/src/drv_wifi_com.c</itemPath>
@@ -364,11 +336,6 @@
             <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/src/dnss.c</itemPath>
             <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/src/http.c</itemPath>
             <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/src/icmp.c</itemPath>
-            <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/src/nbns.c</itemPath>
-            <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/src/zero_conf_helper.c</itemPath>
-            <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/src/zero_conf_link_local.c</itemPath>
-            <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/src/zero_conf_multicast_dns.c</itemPath>
-            <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/src/tcpip_announce.c</itemPath>
             <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/src/hash_fnv.c</itemPath>
             <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/src/oahash.c</itemPath>
             <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/src/tcpip_heap_alloc.c</itemPath>
@@ -415,8 +382,8 @@
     <Elem>../src/system_config/pic32mx_eth_sk+ioexp</Elem>
     <Elem>../src/system_config/pic32mz_ec_sk+meb2</Elem>
     <Elem>../src/system_config/pic32mz_ec_sk+ioexp</Elem>
-    <Elem>../../..</Elem>
     <Elem>../../../../../microchip/harmony/v1_06/framework/crypto/src</Elem>
+    <Elem>../../../microchip/harmony/v1_06</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -462,7 +429,7 @@
         <property key="enable-unroll-loops" value="false"/>
         <property key="exclude-floating-point" value="false"/>
         <property key="extra-include-directories"
-                  value="../src;../src/system_config/wifi_g_db;../src/system_config/wifi_g_db/framework;../../../../../microchip/harmony/v1_06/framework;../../../../../microchip/harmony/v1_06/bsp/wifi_g_db"/>
+                  value="../src;../src/system_config/wifi_g_db;../src/system_config/wifi_g_db/framework;../../../../../microchip/harmony/v1_06/framework;../../../../../microchip/harmony/v1_06/bsp/wifi_g_db;"/>
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="true"/>

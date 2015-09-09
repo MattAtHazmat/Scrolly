@@ -89,22 +89,6 @@ void __ISR(_EXTERNAL_1_VECTOR, ipl3AUTO) _InterruptHandler_MRF24W_Ext1(void)
     DRV_WIFI_MRF24W_ISR((SYS_MODULE_OBJ)0);
 }
 
-void __ISR(_ETH_VECTOR, ipl5AUTO) _IntHandler_ETHMAC(void)
-{
-    DRV_ETHMAC_Tasks_ISR((SYS_MODULE_OBJ)0);
-}
-
-/* This function is used by ETHMAC driver */
-bool SYS_INT_SourceRestore(INT_SOURCE src, int level)
-{
-    if(level)
-    {
-        SYS_INT_SourceEnable(src);
-    }
-
-    return level;
-}
-
 
  
 /*******************************************************************************

@@ -225,10 +225,6 @@ const TCPIP_ARP_MODULE_CONFIG tcpipARPInitData =
 };
 
 
-/*** Announce Discovery Initialization Data ***/
-const TCPIP_ANNOUNCE_MODULE_CONFIG tcpipAnnounceInitData =
-{ 
-};
 
 /*** UDP Sockets Initialization Data ***/
 const TCPIP_UDP_MODULE_CONFIG tcpipUDPInitData =
@@ -278,38 +274,13 @@ const TCPIP_ICMP_MODULE_CONFIG tcpipICMPInitData =
 {
 };
 
-/*** NBNS Server Initialization Data ***/
-const TCPIP_NBNS_MODULE_CONFIG tcpipNBNSInitData =
-{ 
-};
 
-/*** ETH MAC Initialization Data ***/
-const TCPIP_MODULE_MAC_PIC32INT_CONFIG tcpipMACPIC32INTInitData =
-{ 
-    .nTxDescriptors         = TCPIP_EMAC_TX_DESCRIPTORS,
-    .rxBuffSize             = TCPIP_EMAC_RX_BUFF_SIZE,
-    .nRxDescriptors         = TCPIP_EMAC_RX_DESCRIPTORS,
-    .nRxDedicatedBuffers    = TCPIP_EMAC_RX_DEDICATED_BUFFERS,
-    .nRxInitBuffers         = TCPIP_EMAC_RX_INIT_BUFFERS,
-    .rxLowThreshold         = TCPIP_EMAC_RX_LOW_THRESHOLD,
-    .rxLowFill              = TCPIP_EMAC_RX_LOW_FILL,
-    .ethFlags               = TCPIP_EMAC_ETH_OPEN_FLAGS,
-    .phyFlags               = TCPIP_EMAC_PHY_CONFIG_FLAGS,
-    .linkInitDelay          = TCPIP_EMAC_PHY_LINK_INIT_DELAY,
-    .phyAddress             = TCPIP_EMAC_PHY_ADDRESS,
-    .pPhyObject             = &DRV_ETHPHY_OBJECT_National_DP83848,
-    .pPhyBase               = &DRV_ETHPHY_OBJECT_BASE_Default,
-};
 
 /*** Wi-Fi Interface MRF24W Initialization Data ***/
 const TCPIP_MODULE_MAC_MRF24W_CONFIG macMRF24WConfigData ={
 };
 
 
-/*** Zeroconfig initialization data ***/
-const ZCLL_MODULE_CONFIG tcpipZCLLInitData =
-{
-};
 
 
 /*** DHCP server initialization data ***/
@@ -384,14 +355,10 @@ const TCPIP_STACK_MODULE_CONFIG TCPIP_STACK_MODULE_CONFIG_TBL [] =
     {TCPIP_MODULE_TCP,           &tcpipTCPInitData},              // TCPIP_MODULE_TCP,
     {TCPIP_MODULE_DHCP_CLIENT,   &tcpipDHCPInitData},             // TCPIP_MODULE_DHCP_CLIENT,
     {TCPIP_MODULE_DHCP_SERVER,   &tcpipDHCPSInitData},                           // TCPIP_MODULE_DHCP_SERVER,
-    {TCPIP_MODULE_ANNOUNCE,      &tcpipAnnounceInitData},                     // TCPIP_MODULE_ANNOUNCE,
     {TCPIP_MODULE_DNS_CLIENT,&tcpipDNSClientInitData}, // TCPIP_MODULE_DNS_CLIENT,
     {TCPIP_MODULE_DNS_SERVER,&tcpipDNSServerInitData}, // TCPIP_MODULE_DNS_SERVER,
-    {TCPIP_MODULE_NBNS,          &tcpipNBNSInitData},                           // TCPIP_MODULE_NBNS
 
     {TCPIP_MODULE_HTTP_SERVER,   &tcpipHTTPInitData},              // TCPIP_MODULE_HTTP_SERVER,
-    {TCPIP_MODULE_ZCLL, 0},                                    // TCPIP_MODULE_ZCLL,
-    {TCPIP_MODULE_MDNS, 0},                                    // TCPIP_MODULE_MDNS,
     // MAC modules
     {TCPIP_MODULE_MAC_MRF24W, &macMRF24WConfigData},        // TCPIP_MODULE_MAC_MRF24W
 };
@@ -564,11 +531,6 @@ void SYS_Initialize ( void* data )
 
     /* Initialize Middleware */
 
-    /* set priority for ETHERNET interrupt source */
-    SYS_INT_VectorPrioritySet(INT_VECTOR_ETH, INT_PRIORITY_LEVEL5);
-
-    /* set sub-priority for ETHERNET interrupt source */
-    SYS_INT_VectorSubprioritySet(INT_VECTOR_ETH, INT_SUBPRIORITY_LEVEL0);
     
     /* TCPIP Stack Initialization */
     sysObj.tcpip = TCPIP_STACK_Init();

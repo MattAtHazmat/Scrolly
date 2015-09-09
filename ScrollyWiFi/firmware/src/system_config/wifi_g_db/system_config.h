@@ -92,9 +92,13 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define SYS_INT                     true
 
 /*** Ports System Service Configuration ***/
-#define SYS_PORT_AD1PCFG        ~0x7fff
+#define SYS_PORT_AD1PCFG        ~0xffff
 #define SYS_PORT_CNPUE          0x0
 #define SYS_PORT_CNEN           0x0
+
+#define SYS_PORT_F_TRIS         0x38
+#define SYS_PORT_F_LAT          0x0
+#define SYS_PORT_F_ODC          0x0
 /*** Timer System Service Configuration ***/
 #define SYS_TMR_POWER_STATE             SYS_MODULE_POWER_RUN_FULL
 #define SYS_TMR_DRIVER_INDEX            DRV_TMR_INDEX_0
@@ -253,24 +257,22 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define WF_INT_PORT_CHANNEL PORT_CHANNEL_D
 #define WF_INT_BIT_POS      8
 
-#define WF_DEFAULT_NETWORK_TYPE        DRV_WIFI_NETWORK_TYPE_SOFT_AP
-#define WF_DEFAULT_SSID_NAME           "MCHP_G_xxxx"
-#define WF_DEFAULT_LIST_RETRY_COUNT    (DRV_WIFI_RETRY_ADHOC) /* Dummy, not used */
-#define WF_DEFAULT_CHANNEL_LIST        {6}                    /* Set SoftAP network channel */
+#define WF_DEFAULT_NETWORK_TYPE        DRV_WIFI_NETWORK_TYPE_INFRASTRUCTURE
+#define WF_DEFAULT_SSID_NAME           "MicrochipDemoApp"
+#define WF_DEFAULT_LIST_RETRY_COUNT    (DRV_WIFI_RETRY_FOREVER) /* Number (1..255) of times to try to connect to the SSID when using Infrastructure network type */
+#define WF_DEFAULT_CHANNEL_LIST        {} /* Channel list for Domain - use default in module */
 
-#define WF_DEFAULT_WIFI_SECURITY_MODE  DRV_WIFI_SECURITY_OPEN
+#define WF_DEFAULT_WIFI_SECURITY_MODE  DRV_WIFI_SECURITY_WPA_AUTO_WITH_PASS_PHRASE
 #define WF_DEFAULT_WEP_PHRASE          "WEP Phrase" // default WEP passphrase
 #define WF_DEFAULT_WEP_KEY_40          "5AFB6C8E77" // default WEP40 key
 #define WF_DEFAULT_WEP_KEY_104         "90E96780C739409DA50034FCAA" // default WEP104 key
-#define WF_DEFAULT_PSK_PHRASE          "Microchip 802.11 Secret PSK Password" // default WPA passphrase
+#define WF_DEFAULT_PSK_PHRASE          "SooperSekrit" // customized WPA passphrase
 #define WF_DEFAULT_WPS_PIN             "12390212" // default WPS PIN
 
 #define WF_SAVE_WPS_CREDENTIALS        DRV_WIFI_DISABLED
 
 #define WF_CHECK_LINK_STATUS           WF_DISABLED /* Gets the MRF to check the link status relying on Tx failures. */
 #define WF_LINK_LOST_THRESHOLD         40          /* Consecutive Tx transmission failures to be considered the AP is gone away. */
-#define WF_SOFTAP_SEND_KEEP_ALIVE      WF_DISABLED /* Gets SoftAP to send keep alive packets to clients. */
-#define WF_SOFTAP_LINK_LOST_THRESHOLD  40          /* Consecutive null packet transmission failures to be considered the client STA is gone away. */
 
 /* 
  * MRF24W FW has a built-in connection manager, and it is enabled by default.
@@ -283,10 +285,9 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
  */
 #define WF_MODULE_CONNECTION_MANAGER   DRV_WIFI_ENABLED
 
-#define WF_DEFAULT_PS_POLL             DRV_WIFI_DISABLED /* PS_POLL not supported in SoftAP - must be set to DRV_WIFI_DISABLED */
+#define WF_DEFAULT_PS_POLL             DRV_WIFI_DISABLED /* DRV_WIFI_ENABLED or DRV_WIFI_DISABLED */
 #define WF_SOFTWARE_MULTICAST_FILTER   DRV_WIFI_ENABLED
 
-#define WF_ENABLE_STATIC_IP
 
 
 // *****************************************************************************
@@ -439,8 +440,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 
 /*** NBNS Configuration ***/
-#define TCPIP_STACK_USE_NBNS
-#define TCPIP_NBNS_TASK_TICK_RATE   110
+//#define TCPIP_STACK_USE_NBNS
+//#define TCPIP_NBNS_TASK_TICK_RATE   110
 
 
 
@@ -466,51 +467,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define TCPIP_TCP_MAX_SOCKETS		            		10
 #define TCPIP_TCP_TASK_TICK_RATE		        	5
 
-/*** announce Configuration ***/
-#define TCPIP_STACK_USE_ANNOUNCE
-#define TCPIP_ANNOUNCE_MAX_PAYLOAD 	512
-#define TCPIP_ANNOUNCE_TASK_RATE    333
 
-/*** TCPIP MAC Configuration ***/
-#define TCPIP_EMAC_TX_DESCRIPTORS				8
-#define TCPIP_EMAC_RX_DESCRIPTORS				6
-#define TCPIP_EMAC_RX_DEDICATED_BUFFERS				4
-#define TCPIP_EMAC_RX_INIT_BUFFERS				    0
-#define TCPIP_EMAC_RX_LOW_THRESHOLD				    1
-#define TCPIP_EMAC_RX_LOW_FILL				        2
-#define TCPIP_EMAC_RX_BUFF_SIZE		    			1536
-#define TCPIP_EMAC_RX_MAX_FRAME		    			1536
-#define TCPIP_EMAC_RX_FRAGMENTS		    			1
-#define TCPIP_EMAC_ETH_OPEN_FLAGS       			\
-                                                    TCPIP_ETH_OPEN_AUTO |\
-                                                    TCPIP_ETH_OPEN_FDUPLEX |\
-                                                    TCPIP_ETH_OPEN_HDUPLEX |\
-                                                    TCPIP_ETH_OPEN_100 |\
-                                                    TCPIP_ETH_OPEN_10 |\
-                                                    TCPIP_ETH_OPEN_MDIX_AUTO |\
-                                                    0
-#define TCPIP_EMAC_PHY_CONFIG_FLAGS     			\
-                                                    DRV_ETHPHY_CFG_AUTO | \
-                                                    0                                                    
-#define TCPIP_EMAC_PHY_LINK_INIT_DELAY  			500
-#define TCPIP_EMAC_PHY_ADDRESS		    			1
-#define TCPIP_EMAC_INTERRUPT_MODE        			true
-#define DRV_ETHPHY_INSTANCES_NUMBER				1
-#define DRV_ETHPHY_CLIENTS_NUMBER				1
-#define DRV_ETHPHY_INDEX		        		1
-#define DRV_ETHPHY_PERIPHERAL_ID				1
-#define DRV_ETHPHY_NEG_INIT_TMO		    			1
-#define DRV_ETHPHY_NEG_DONE_TMO		    			2000
-#define DRV_ETHPHY_RESET_CLR_TMO				500
-#define DRV_ETHMAC_INSTANCES_NUMBER				1
-#define DRV_ETHMAC_CLIENTS_NUMBER				1
-#define DRV_ETHMAC_INDEX	    	    			1
-#define DRV_ETHMAC_PERIPHERAL_ID				1
-#define DRV_ETHMAC_INTERRUPT_VECTOR				INT_VECTOR_ETHERNET
-#define DRV_ETHMAC_INTERRUPT_SOURCE				INT_SOURCE_ETH_1
-#define DRV_ETHMAC_POWER_STATE		    			SYS_MODULE_POWER_RUN_FULL
-
-#define DRV_ETHMAC_INTERRUPT_MODE        			true
 
 
 
@@ -525,39 +482,6 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define TCPIP_UDP_USE_TX_CHECKSUM             			true
 
 #define TCPIP_UDP_USE_RX_CHECKSUM             			true
-
-#define TCPIP_STACK_USE_ZEROCONF_LINK_LOCAL
-#define TCPIP_ZC_LL_PROBE_WAIT 1
-#define TCPIP_ZC_LL_PROBE_MIN 1
-#define TCPIP_ZC_LL_PROBE_MAX 2
-#define TCPIP_ZC_LL_PROBE_NUM 3
-#define TCPIP_ZC_LL_ANNOUNCE_WAIT 2
-#define TCPIP_ZC_LL_ANNOUNCE_NUM 2
-#define TCPIP_ZC_LL_ANNOUNCE_INTERVAL 2
-#define TCPIP_ZC_LL_MAX_CONFLICTS 10
-#define TCPIP_ZC_LL_RATE_LIMIT_INTERVAL 60
-#define TCPIP_ZC_LL_DEFEND_INTERVAL 10
-#define TCPIP_ZC_LL_IPV4_LLBASE 0xa9fe0100
-#define TCPIP_ZC_LL_IPV4_LLBASE_MASK 0x0000FFFF
-#define TCPIP_ZC_LL_TASK_TICK_RATE 333
-#define TCPIP_STACK_USE_ZEROCONF_MDNS_SD
-#define TCPIP_ZC_MDNS_TASK_TICK_RATE 63
-#define TCPIP_ZC_MDNS_PORT 5353
-#define TCPIP_ZC_MDNS_MAX_HOST_NAME_SIZE 32
-#define TCPIP_ZC_MDNS_MAX_LABEL_SIZE 64
-#define TCPIP_ZC_MDNS_MAX_RR_NAME_SIZE 256
-#define TCPIP_ZC_MDNS_MAX_SRV_TYPE_SIZE 32
-#define TCPIP_ZC_MDNS_MAX_SRV_NAME_SIZE 64
-#define TCPIP_ZC_MDNS_MAX_TXT_DATA_SIZE 128
-#define TCPIP_ZC_MDNS_RESOURCE_RECORD_TTL_VAL 3600
-#define TCPIP_ZC_MDNS_MAX_RR_NUM 4
-#define TCPIP_ZC_MDNS_PROBE_WAIT 750
-#define TCPIP_ZC_MDNS_PROBE_INTERVAL 250
-#define TCPIP_ZC_MDNS_PROBE_NUM 3
-#define TCPIP_ZC_MDNS_MAX_PROBE_CONFLICT_NUM 30
-#define TCPIP_ZC_MDNS_ANNOUNCE_NUM 3
-#define TCPIP_ZC_MDNS_ANNOUNCE_INTERVAL 250
-#define TCPIP_ZC_MDNS_ANNOUNCE_WAIT 250
 
 
 /*** Network Configuration Index 0 ***/

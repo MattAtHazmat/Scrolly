@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<configuration version="1.0.6.7">
+<configuration version="1.0.6.12">
   <Designer>
     <Screens height="200" width="320">
       <Screen active="true" background="000000" export="true" name="Untitled" primary="true">
@@ -26,8 +26,8 @@
     </Schemes>
   </Designer>
   <General>
-    <HarmonyPath path="../../.."/>
-    <ForceOptimization flag="false"/>
+    <HarmonyPath path="../../../microchip/harmony/v1_06"/>
+    <ForceOptimization flag="true"/>
   </General>
   <Manifest>
     <Files>
@@ -44,20 +44,12 @@
         <Path>Header Files/framework/tcpip/stack</Path>
       </File>
       <File>
-        <Name>zero_conf_multicast_dns.c</Name>
-        <Path>Source Files/framework/tcpip/stack</Path>
-      </File>
-      <File>
         <Name>ipv4.c</Name>
         <Path>Source Files/framework/tcpip/stack</Path>
       </File>
       <File>
         <Name>tcpip_helpers_private.h</Name>
         <Path>Header Files/framework/tcpip/stack</Path>
-      </File>
-      <File>
-        <Name>drv_ethphy.h</Name>
-        <Path>Header Files/framework/driver/ethphy</Path>
       </File>
       <File>
         <Name>http_private.h</Name>
@@ -76,10 +68,6 @@
         <Path>Source Files/framework/driver/nvm/src/dynamic</Path>
       </File>
       <File>
-        <Name>zero_conf_helper.c</Name>
-        <Path>Source Files/framework/tcpip/stack</Path>
-      </File>
-      <File>
         <Name>dhcp_private.h</Name>
         <Path>Header Files/framework/tcpip/stack</Path>
       </File>
@@ -94,10 +82,6 @@
       <File>
         <Name>drv_wifi_config_data.h</Name>
         <Path>Header Files/framework/driver/wifi/mrf24w/src</Path>
-      </File>
-      <File>
-        <Name>zero_conf_link_local_private.h</Name>
-        <Path>Header Files/framework/tcpip/stack</Path>
       </File>
       <File>
         <Name>drv_wifi_raw.c</Name>
@@ -118,10 +102,6 @@
       <File>
         <Name>drv_wifi_connection_manager.c</Name>
         <Path>Source Files/framework/driver/wifi/mrf24w/src</Path>
-      </File>
-      <File>
-        <Name>_eth_dcpt_lists.h</Name>
-        <Path>Header Files/framework/driver/ethmac</Path>
       </File>
       <File>
         <Name>arp_private.h</Name>
@@ -176,10 +156,6 @@
         <Path>Header Files/framework/system/common</Path>
       </File>
       <File>
-        <Name>drv_extphy_regs.h</Name>
-        <Path>Header Files/framework/driver/ethphy</Path>
-      </File>
-      <File>
         <Name>drv_wifi_spi.c</Name>
         <Path>Source Files/framework/driver/wifi/mrf24w/src</Path>
       </File>
@@ -202,10 +178,6 @@
       <File>
         <Name>ipv4_private.h</Name>
         <Path>Header Files/framework/tcpip/stack</Path>
-      </File>
-      <File>
-        <Name>drv_ethmac_local.h</Name>
-        <Path>Header Files/framework/driver/ethmac</Path>
       </File>
       <File>
         <Name>drv_nvm.h</Name>
@@ -256,10 +228,6 @@
         <Path>Header Files/framework/tcpip/stack</Path>
       </File>
       <File>
-        <Name>drv_extphy_dp83848.c</Name>
-        <Path>Source Files/framework/driver/ethphy</Path>
-      </File>
-      <File>
         <Name>drv_spi_sys_queue.h</Name>
         <Path>Header Files/framework/driver/spi/private</Path>
       </File>
@@ -270,10 +238,6 @@
       <File>
         <Name>tcp_private.h</Name>
         <Path>Header Files/framework/tcpip/stack</Path>
-      </File>
-      <File>
-        <Name>drv_ethmac_lib.c</Name>
-        <Path>Source Files/framework/driver/ethmac</Path>
       </File>
       <File>
         <Name>ipv4.h</Name>
@@ -322,10 +286,6 @@
       <File>
         <Name>arc4.h</Name>
         <Path>Header Files/framework/crypto/src</Path>
-      </File>
-      <File>
-        <Name>zero_conf_link_local.h</Name>
-        <Path>Header Files/framework/tcpip</Path>
       </File>
       <File>
         <Name>tcp.c</Name>
@@ -404,10 +364,6 @@
         <Path>Source Files/framework/system/fs/src/dynamic</Path>
       </File>
       <File>
-        <Name>nbns.h</Name>
-        <Path>Header Files/framework/tcpip</Path>
-      </File>
-      <File>
         <Name>dns_manager.h</Name>
         <Path>Header Files/framework/tcpip/stack</Path>
       </File>
@@ -422,14 +378,6 @@
       <File>
         <Name>drv_wifi_mgmt_msg.h</Name>
         <Path>Header Files/framework/driver/wifi/mrf24w/src</Path>
-      </File>
-      <File>
-        <Name>drv_ethphy.c</Name>
-        <Path>Source Files/framework/driver/ethphy</Path>
-      </File>
-      <File>
-        <Name>drv_ethmac.h</Name>
-        <Path>Header Files/framework/driver/ethmac</Path>
       </File>
       <File>
         <Name>drv_wifi_mac_pic32.c</Name>
@@ -448,10 +396,6 @@
         <Path>Source Files/framework/tcpip/common</Path>
       </File>
       <File>
-        <Name>tcpip_announce.c</Name>
-        <Path>Source Files/framework/tcpip/stack</Path>
-      </File>
-      <File>
         <Name>drv_wifi_update_firmware_common.c</Name>
         <Path>Source Files/framework/driver/wifi/mrf24w/src</Path>
       </File>
@@ -464,20 +408,12 @@
         <Path>Source Files/framework/driver/wifi/mrf24w/src</Path>
       </File>
       <File>
-        <Name>drv_extphy_dp83848.h</Name>
-        <Path>Header Files/framework/driver/ethphy</Path>
-      </File>
-      <File>
         <Name>sys_fs_wrapper.c</Name>
         <Path>Source Files/framework/tcpip/common</Path>
       </File>
       <File>
         <Name>icmp.c</Name>
         <Path>Source Files/framework/tcpip/stack</Path>
-      </File>
-      <File>
-        <Name>tcpip_announce_manager.h</Name>
-        <Path>Header Files/framework/tcpip/stack</Path>
       </File>
       <File>
         <Name>tcpip_manager.c</Name>
@@ -548,10 +484,6 @@
         <Path>Header Files/framework/tcpip/stack</Path>
       </File>
       <File>
-        <Name>drv_ethphy_local.h</Name>
-        <Path>Header Files/framework/driver/ethphy</Path>
-      </File>
-      <File>
         <Name>drv_wifi_connection_algorithm.c</Name>
         <Path>Source Files/framework/driver/wifi/mrf24w/src</Path>
       </File>
@@ -568,16 +500,8 @@
         <Path>Source Files/framework/system/random/src</Path>
       </File>
       <File>
-        <Name>drv_ethmac_lib.h</Name>
-        <Path>Header Files/framework/driver/ethmac</Path>
-      </File>
-      <File>
         <Name>tls.h</Name>
         <Path>Header Files/framework/tcpip</Path>
-      </File>
-      <File>
-        <Name>zero_conf_link_local.c</Name>
-        <Path>Source Files/framework/tcpip/stack</Path>
       </File>
       <File>
         <Name>dnss_manager.h</Name>
@@ -585,14 +509,6 @@
       </File>
       <File>
         <Name>oahash.h</Name>
-        <Path>Header Files/framework/tcpip/stack</Path>
-      </File>
-      <File>
-        <Name>zero_conf_multicast_dns.h</Name>
-        <Path>Header Files/framework/tcpip</Path>
-      </File>
-      <File>
-        <Name>zero_conf_manager.h</Name>
         <Path>Header Files/framework/tcpip/stack</Path>
       </File>
       <File>
@@ -618,14 +534,6 @@
       <File>
         <Name>dhcps_manager.h</Name>
         <Path>Header Files/framework/tcpip/stack</Path>
-      </File>
-      <File>
-        <Name>nbns_manager.h</Name>
-        <Path>Header Files/framework/tcpip/stack</Path>
-      </File>
-      <File>
-        <Name>nbns.c</Name>
-        <Path>Source Files/framework/tcpip/stack</Path>
       </File>
       <File>
         <Name>tcpip.h</Name>
@@ -674,10 +582,6 @@
       <File>
         <Name>oahash.c</Name>
         <Path>Source Files/framework/tcpip/stack</Path>
-      </File>
-      <File>
-        <Name>zero_conf_helper.h</Name>
-        <Path>Header Files/framework/tcpip/stack</Path>
       </File>
       <File>
         <Name>tcpip_module_manager.h</Name>
@@ -736,10 +640,6 @@
         <Path>Header Files/framework/tcpip/stack</Path>
       </File>
       <File>
-        <Name>drv_ethmac.c</Name>
-        <Path>Source Files/framework/driver/ethmac</Path>
-      </File>
-      <File>
         <Name>tcpip_common_ports.h</Name>
         <Path>Header Files/framework/tcpip</Path>
       </File>
@@ -776,12 +676,12 @@
       <Template>
         <Name>system_init.c</Name>
         <Path>Source Files/app/system_config/wifi_g_db</Path>
-        <Checksum>09E27A568A0454EC522E5979CADE7822</Checksum>
+        <Checksum>16794A36351CE7BB143160D4F4793CB3</Checksum>
       </Template>
       <Template>
         <Name>sys_ports_static.c</Name>
         <Path>Source Files/app/system_config/wifi_g_db/framework/system/ports/src</Path>
-        <Checksum>BDAE280569ED20E52D0025190D1E4BA1</Checksum>
+        <Checksum>D0383ACCC7BAF4F1D0E8C76C94501B46</Checksum>
       </Template>
       <Template>
         <Name>sys_clk_static.c</Name>
@@ -844,21 +744,21 @@
       <Template>
         <Name>system_interrupt.c</Name>
         <Path>Source Files/app/system_config/wifi_g_db</Path>
-        <Checksum>43114A2F090E9B2F3CDC104A327F4388</Checksum>
+        <Checksum>18F78BF0ECF3D82A95D598576A4DC5FA</Checksum>
       </Template>
       <Template>
         <Name>system_config.h</Name>
         <Path>Header Files/app/system_config/wifi_g_db</Path>
-        <Checksum>60A6FBE2B9FBF94411129CD2CFD20DEB</Checksum>
+        <Checksum>2E1CE5BBD442F2350D7E9C42E832F3DE</Checksum>
       </Template>
     </Templates>
     <CompilerItems>
       <C32>
-        <Include value="../../../../../bsp/wifi_g_db"/>
+        <Include value="../../../../../microchip/harmony/v1_06/bsp/wifi_g_db"/>
       </C32>
     </CompilerItems>
     <Libraries>
-      <Library value="../../../../../bin/framework/peripheral/PIC32MX695F512H_peripherals.a"/>
+      <Library value="../../../../../microchip/harmony/v1_06/bin/framework/peripheral/PIC32MX695F512H_peripherals.a"/>
     </Libraries>
   </Manifest>
 </configuration>
