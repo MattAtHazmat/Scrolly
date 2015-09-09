@@ -66,7 +66,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 */
 
 #include "bsp_config.h"
-
+#include "private.h"
 // *****************************************************************************
 // *****************************************************************************
 // Section: System Service Configuration
@@ -258,7 +258,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define WF_INT_BIT_POS      8
 
 #define WF_DEFAULT_NETWORK_TYPE        DRV_WIFI_NETWORK_TYPE_INFRASTRUCTURE
-#define WF_DEFAULT_SSID_NAME           "MicrochipDemoApp"
+//#define WF_DEFAULT_SSID_NAME           "MicrochipDemoApp"
 #define WF_DEFAULT_LIST_RETRY_COUNT    (DRV_WIFI_RETRY_FOREVER) /* Number (1..255) of times to try to connect to the SSID when using Infrastructure network type */
 #define WF_DEFAULT_CHANNEL_LIST        {} /* Channel list for Domain - use default in module */
 
@@ -266,7 +266,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define WF_DEFAULT_WEP_PHRASE          "WEP Phrase" // default WEP passphrase
 #define WF_DEFAULT_WEP_KEY_40          "5AFB6C8E77" // default WEP40 key
 #define WF_DEFAULT_WEP_KEY_104         "90E96780C739409DA50034FCAA" // default WEP104 key
-#define WF_DEFAULT_PSK_PHRASE          "SooperSekrit" // customized WPA passphrase
+//#define WF_DEFAULT_PSK_PHRASE          "SooperSekrit" // customized WPA passphrase
 #define WF_DEFAULT_WPS_PIN             "12390212" // default WPS PIN
 
 #define WF_SAVE_WPS_CREDENTIALS        DRV_WIFI_DISABLED
