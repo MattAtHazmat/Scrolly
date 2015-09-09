@@ -56,6 +56,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system/clk/sys_clk_static.h"
 #include "system/devcon/sys_devcon.h"
 #include "system/int/sys_int.h"
+#include "system/dma/sys_dma.h"
 #include "system/fs/sys_fs.h"
 #include "system/fs/sys_fs_media_manager.h"
 #include "system/random/sys_random.h"
@@ -71,7 +72,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "tcpip/tcpip.h"
 #include "driver/ethmac/drv_ethmac.h"
 #include "driver/wifi/mrf24w/drv_wifi.h"
-#include "app.h"
+#include "tcpipstack.h"
+#include "ledscroller.h"
 
 
 // DOM-IGNORE-BEGIN
@@ -107,11 +109,16 @@ typedef struct
 {
     SYS_MODULE_OBJ  sysDevcon;
     SYS_MODULE_OBJ  sysTmr;
+    SYS_MODULE_OBJ  sysDma;
     SYS_MODULE_OBJ  drvTmr0;
+    SYS_MODULE_OBJ  drvTmr1;
     SYS_MODULE_OBJ  drvNvm;
 
     /*** SPI Object for Index 0 ***/
     SYS_MODULE_OBJ				spiObjectIdx0;
+    
+    /*** SPI Object for Index 1 ***/
+    SYS_MODULE_OBJ				spiObjectIdx1;
     SYS_MODULE_OBJ  tcpip;
 
 } SYSTEM_OBJECTS;

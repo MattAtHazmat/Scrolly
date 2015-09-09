@@ -63,24 +63,24 @@
         <Path>Source Files/framework/driver/spi</Path>
       </File>
       <File>
-        <Name>bsp_sys_init.c</Name>
-        <Path>Source Files/bsp/pic32mx_usb_sk2</Path>
-      </File>
-      <File>
         <Name>driver.h</Name>
         <Path>Header Files/framework/driver</Path>
+      </File>
+      <File>
+        <Name>bsp_sys_init.c</Name>
+        <Path>Source Files/bsp/pic32mx_usb_sk2</Path>
       </File>
       <File>
         <Name>sys_devcon.c</Name>
         <Path>Source Files/framework/system/devcon/src</Path>
       </File>
       <File>
-        <Name>drv_spi_sys_queue_local_fifo.h</Name>
-        <Path>Header Files/framework/driver/spi/private</Path>
-      </File>
-      <File>
         <Name>drv_spi.h</Name>
         <Path>Header Files/framework/driver/spi</Path>
+      </File>
+      <File>
+        <Name>drv_spi_sys_queue_local_fifo.h</Name>
+        <Path>Header Files/framework/driver/spi/private</Path>
       </File>
       <File>
         <Name>sys_ports.h</Name>
@@ -162,14 +162,14 @@
         <Checksum>1B968DA82B5DD869A6119C3B7628D753</Checksum>
       </Template>
       <Template>
-        <Name>system_definitions.h</Name>
-        <Path>Header Files/app/system_config/PIC32_USB_SK</Path>
-        <Checksum>74453D283801D3E384F21B0DB21E6BBA</Checksum>
-      </Template>
-      <Template>
         <Name>system_config.h</Name>
         <Path>Header Files/app/system_config/PIC32_USB_SK</Path>
         <Checksum>C3E30C4E30462194A745BB294674B582</Checksum>
+      </Template>
+      <Template>
+        <Name>system_definitions.h</Name>
+        <Path>Header Files/app/system_config/PIC32_USB_SK</Path>
+        <Checksum>74453D283801D3E384F21B0DB21E6BBA</Checksum>
       </Template>
       <Template>
         <Name>sys_ports_static.c</Name>

@@ -125,6 +125,16 @@ const DRV_TMR_INIT drvTmr0InitData =
     .interruptSource = DRV_TMR_INTERRUPT_SOURCE_IDX0,
     .asyncWriteEnable = false,
 };
+const DRV_TMR_INIT drvTmr1InitData =
+{
+    .moduleInit.sys.powerState = DRV_TMR_POWER_STATE_IDX1,
+    .tmrId = DRV_TMR_PERIPHERAL_ID_IDX1,
+    .clockSource = DRV_TMR_CLOCK_SOURCE_IDX1, 
+    .prescale = DRV_TMR_PRESCALE_IDX1,
+    .mode = DRV_TMR_OPERATION_MODE_IDX1,
+    .interruptSource = DRV_TMR_INTERRUPT_SOURCE_IDX1,
+    .asyncWriteEnable = false,
+};
 // </editor-fold>
 //<editor-fold defaultstate="collapsed" desc="DRV_NVM Initialization Data">
 extern const uint8_t NVM_MEDIA_DATA[];
@@ -188,6 +198,30 @@ const DRV_NVM_INIT drvNvmInit =
     .inputSamplePhase = DRV_SPI_INPUT_PHASE_IDX0,
     .queueSize = DRV_SPI_QUEUE_SIZE_IDX0,
     .jobQueueReserveSize = DRV_SPI_RESERVED_JOB_IDX0,
+ };
+ /*** Index 1  ***/
+ DRV_SPI_INIT drvSpi1InitData =
+ {
+    .spiId = DRV_SPI_SPI_ID_IDX1,
+    .taskMode = DRV_SPI_TASK_MODE_IDX1,
+    .spiMode = DRV_SPI_SPI_MODE_IDX1,
+    .allowIdleRun = DRV_SPI_ALLOW_IDLE_RUN_IDX1,
+    .spiProtocolType = DRV_SPI_SPI_PROTOCOL_TYPE_IDX1,
+    .commWidth = DRV_SPI_COMM_WIDTH_IDX1,
+    .spiClk = DRV_SPI_SPI_CLOCK_IDX1,
+    .baudRate = DRV_SPI_BAUD_RATE_IDX1,
+    .bufferType = DRV_SPI_BUFFER_TYPE_IDX1,
+    .clockMode = DRV_SPI_CLOCK_MODE_IDX1,
+    .inputSamplePhase = DRV_SPI_INPUT_PHASE_IDX1,
+    .txInterruptSource = DRV_SPI_TX_INT_SOURCE_IDX1,
+    .rxInterruptSource = DRV_SPI_RX_INT_SOURCE_IDX1,
+    .errInterruptSource = DRV_SPI_ERROR_INT_SOURCE_IDX1,
+    .txDmaChannel =         DRV_SPI_TX_DMA_CHANNEL_IDX1,
+    .txDmaThreshold =       DRV_SPI_TX_DMA_THRESHOLD_IDX1,
+    .rxDmaChannel =         DRV_SPI_RX_DMA_CHANNEL_IDX1,
+    .rxDmaThreshold =       DRV_SPI_RX_DMA_THRESHOLD_IDX1,
+    .queueSize = DRV_SPI_QUEUE_SIZE_IDX1,
+    .jobQueueReserveSize = DRV_SPI_RESERVED_JOB_IDX1,
  };
 // </editor-fold>
 //<editor-fold defaultstate="collapsed" desc="SYS_TMR Initialization Data">
@@ -431,6 +465,17 @@ const SYS_DEVCON_INIT sysDevconInit =
 // </editor-fold>
 
 
+//<editor-fold defaultstate="collapsed" desc="SYS_DMA Initialization Data">
+
+/*** System DMA Initialization Data ***/
+
+const SYS_DMA_INIT sysDmaInit =
+{
+	.sidl = SYS_DMA_SIDL_DISABLE,
+
+};
+
+// </editor-fold>
 //<editor-fold defaultstate="collapsed" desc="SYS_FS Initialization Data">
 
 
@@ -487,6 +532,10 @@ void SYS_Initialize ( void* data )
     SYS_DEVCON_PerformanceConfig(SYS_CLK_SystemFrequencyGet());
     SYS_DEVCON_JTAGDisable();
     SYS_PORTS_Initialize();
+    sysObj.sysDma = SYS_DMA_Initialize((SYS_MODULE_INIT *)&sysDmaInit);
+
+
+
 
     /* Board Support Package Initialization */
     BSP_Initialize();
@@ -494,9 +543,12 @@ void SYS_Initialize ( void* data )
     /* Initialize Drivers */
 
     sysObj.drvTmr0 = DRV_TMR_Initialize(DRV_TMR_INDEX_0, (SYS_MODULE_INIT *)&drvTmr0InitData);
+    sysObj.drvTmr1 = DRV_TMR_Initialize(DRV_TMR_INDEX_1, (SYS_MODULE_INIT *)&drvTmr1InitData);
 
     SYS_INT_VectorPrioritySet(INT_VECTOR_T1, INT_PRIORITY_LEVEL4);
     SYS_INT_VectorSubprioritySet(INT_VECTOR_T1, INT_SUBPRIORITY_LEVEL3);
+    SYS_INT_VectorPrioritySet(INT_VECTOR_T3, INT_PRIORITY_LEVEL1);
+    SYS_INT_VectorSubprioritySet(INT_VECTOR_T3, INT_SUBPRIORITY_LEVEL0);
  
  
  
@@ -504,6 +556,13 @@ void SYS_Initialize ( void* data )
 
  
     sysObj.spiObjectIdx0 = DRV_SPI_Initialize(DRV_SPI_INDEX_0, (const SYS_MODULE_INIT  * const)&drvSpi0InitData);
+
+    /*** SPI Driver Index 1 initialization***/
+
+    SYS_INT_VectorPrioritySet(DRV_SPI_INT_VECTOR_IDX1, DRV_SPI_INT_PRIORITY_IDX1);
+    SYS_INT_VectorSubprioritySet(DRV_SPI_INT_VECTOR_IDX1, DRV_SPI_INT_SUB_PRIORITY_IDX1);
+ 
+    sysObj.spiObjectIdx1 = DRV_SPI_Initialize(DRV_SPI_INDEX_1, (const SYS_MODULE_INIT  * const)&drvSpi1InitData);
     /* Configure the Flash Controller Interrupt Priority */
     SYS_INT_VectorPrioritySet(INT_VECTOR_FCE, INT_PRIORITY_LEVEL4);
 
@@ -543,7 +602,8 @@ void SYS_Initialize ( void* data )
     SYS_INT_Enable();
 
     /* Initialize the Application */
-    APP_Initialize();
+    TCPIPSTACK_Initialize();
+    LEDSCROLLER_Initialize();
 }
 
 

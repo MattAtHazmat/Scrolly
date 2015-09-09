@@ -62,7 +62,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 #include <xc.h>
 #include <sys/attribs.h>
-#include "app.h"
+#include "tcpipstack.h"
+#include "ledscroller.h"
 #include "system_definitions.h"
 
 // *****************************************************************************
@@ -76,12 +77,23 @@ void __ISR(_TIMER_1_VECTOR, ipl4AUTO) _IntHandlerDrvTmrInstance0(void)
     DRV_TMR_Tasks_ISR(sysObj.drvTmr0);
 
 }
+void __ISR(_TIMER_3_VECTOR, ipl1AUTO) _IntHandlerDrvTmrInstance1(void)
+{
+
+    DRV_TMR_Tasks_ISR(sysObj.drvTmr1);
+
+}
  
+void __ISR(_SPI_4_VECTOR, ipl1AUTO) _IntHandlerSPIInstance1(void)
+{
+    DRV_SPI_Tasks(sysObj.spiObjectIdx1);
+}
 void __ISR(_FCE_VECTOR, ipl4AUTO) _IntHandlerDrvNvm (void)
 {
     DRV_NVM_Tasks(sysObj.drvNvm);
 
 }
+
 
 
 void __ISR(_EXTERNAL_1_VECTOR, ipl3AUTO) _InterruptHandler_MRF24W_Ext1(void)

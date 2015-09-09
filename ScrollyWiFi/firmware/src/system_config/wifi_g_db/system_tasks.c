@@ -74,11 +74,14 @@ void SYS_Tasks ( void )
 {
     /* Maintain system services */
     SYS_DEVCON_Tasks(sysObj.sysDevcon);
+    /* Maintain the DMA system state machine. */
+    SYS_DMA_Tasks(sysObj.sysDma);
     SYS_FS_Tasks();
     SYS_TMR_Tasks(sysObj.sysTmr);
 
     /* Maintain Device Drivers */
         DRV_TMR_Tasks(sysObj.drvTmr0);
+        DRV_TMR_Tasks(sysObj.drvTmr1);
 
     /* Maintain Middleware & Other Libraries */
     /* Maintain the TCP/IP Stack*/
@@ -86,7 +89,8 @@ void SYS_Tasks ( void )
 
 
     /* Maintain the application's state machine. */
-    APP_Tasks();
+    TCPIPSTACK_Tasks();
+    LEDSCROLLER_Tasks();
 }
 
 

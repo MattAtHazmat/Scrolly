@@ -64,6 +64,10 @@
         <Path>Header Files/framework/tcpip</Path>
       </File>
       <File>
+        <Name>sys_dma.c</Name>
+        <Path>Source Files/framework/system/dma</Path>
+      </File>
+      <File>
         <Name>drv_nvm_erasewrite.c</Name>
         <Path>Source Files/framework/driver/nvm/src/dynamic</Path>
       </File>
@@ -154,6 +158,10 @@
       <File>
         <Name>sys_module.h</Name>
         <Path>Header Files/framework/system/common</Path>
+      </File>
+      <File>
+        <Name>sys_dma.h</Name>
+        <Path>Header Files/framework/system/dma</Path>
       </File>
       <File>
         <Name>drv_wifi_spi.c</Name>
@@ -676,7 +684,7 @@
       <Template>
         <Name>system_init.c</Name>
         <Path>Source Files/app/system_config/wifi_g_db</Path>
-        <Checksum>16794A36351CE7BB143160D4F4793CB3</Checksum>
+        <Checksum>D174F95E04B3070032444A7EC009603A</Checksum>
       </Template>
       <Template>
         <Name>sys_ports_static.c</Name>
@@ -691,7 +699,7 @@
       <Template>
         <Name>system_tasks.c</Name>
         <Path>Source Files/app/system_config/wifi_g_db</Path>
-        <Checksum>56ECEE1DA1173144F0252EA7E60C774C</Checksum>
+        <Checksum>D3134BD6497473D900BD15DF6E4C7B60</Checksum>
       </Template>
       <Template>
         <Name>system_exceptions.c</Name>
@@ -704,13 +712,9 @@
         <Checksum>3E40A02B90CC246EA28E3B90F04B664E</Checksum>
       </Template>
       <Template>
-        <Name>app.h</Name>
-        <Path>Header Files/app</Path>
-      </Template>
-      <Template>
-        <Name>sys_clk_static.h</Name>
-        <Path>Header Files/app/system_config/wifi_g_db/framework/system/clk</Path>
-        <Checksum>999179DADE9ECD59953526F5E9F83ACC</Checksum>
+        <Name>drv_spi_master_dma_tasks.c</Name>
+        <Path>Source Files/app/system_config/wifi_g_db/framework/driver/spi/dynamic</Path>
+        <Checksum>9FAF188AFC3BED4FC34B61D2222C6057</Checksum>
       </Template>
       <Template>
         <Name>mpfs_img2.c</Name>
@@ -718,23 +722,45 @@
         <Checksum>051FD0058284818F790C5D031232D78B</Checksum>
       </Template>
       <Template>
+        <Name>sys_clk_static.h</Name>
+        <Path>Header Files/app/system_config/wifi_g_db/framework/system/clk</Path>
+        <Checksum>999179DADE9ECD59953526F5E9F83ACC</Checksum>
+      </Template>
+      <Template>
+        <Name>TCPIPStack.h</Name>
+        <Path>Header Files/app</Path>
+      </Template>
+      <Template>
+        <Name>LEDScroller.c</Name>
+        <Path>Source Files/app</Path>
+      </Template>
+      <Template>
+        <Name>system_definitions.h</Name>
+        <Path>Header Files/app/system_config/wifi_g_db</Path>
+        <Checksum>114AB7ADBC7B6865ABE9C48B9741C17F</Checksum>
+      </Template>
+      <Template>
         <Name>custom_http_app.c</Name>
         <Path>Source Files/app</Path>
         <Checksum>F780D86C8576DF70E5AB441B74DE8AC1</Checksum>
       </Template>
       <Template>
-        <Name>system_definitions.h</Name>
-        <Path>Header Files/app/system_config/wifi_g_db</Path>
-        <Checksum>58140F00148AA25016FC52956B73A5AA</Checksum>
+        <Name>TCPIPStack.c</Name>
+        <Path>Source Files/app</Path>
       </Template>
       <Template>
-        <Name>app.c</Name>
-        <Path>Source Files/app</Path>
+        <Name>drv_spi_master_rm_tasks.c</Name>
+        <Path>Source Files/app/system_config/wifi_g_db/framework/driver/spi/dynamic</Path>
+        <Checksum>B1D418CCAD5461556F1B671D88C9399F</Checksum>
+      </Template>
+      <Template>
+        <Name>LEDScroller.h</Name>
+        <Path>Header Files/app</Path>
       </Template>
       <Template>
         <Name>drv_spi_tasks.c</Name>
         <Path>Source Files/app/system_config/wifi_g_db/framework/driver/spi/dynamic</Path>
-        <Checksum>607DFCDA8CDE17D520484DBE0B8073C2</Checksum>
+        <Checksum>FCAD95AEB89A71530E9CCB161A3ADF1C</Checksum>
       </Template>
       <Template>
         <Name>http_print.c</Name>
@@ -744,12 +770,12 @@
       <Template>
         <Name>system_interrupt.c</Name>
         <Path>Source Files/app/system_config/wifi_g_db</Path>
-        <Checksum>18F78BF0ECF3D82A95D598576A4DC5FA</Checksum>
+        <Checksum>DCF52CD39E266F97CDFA3185535F6DAA</Checksum>
       </Template>
       <Template>
         <Name>system_config.h</Name>
         <Path>Header Files/app/system_config/wifi_g_db</Path>
-        <Checksum>2E1CE5BBD442F2350D7E9C42E832F3DE</Checksum>
+        <Checksum>955E63681E63B55C05260B46159B291D</Checksum>
       </Template>
     </Templates>
     <CompilerItems>
