@@ -63,7 +63,7 @@ typedef struct {
     uint8_t characterString[DISPLAY_STRING_LENGTH];
     uint8_t characterColor[DISPLAY_STRING_LENGTH];
     uint8_t backgroundColor;
-    struct {
+    struct __attribute__((packed)){
         uint8_t columns;
         uint8_t rows;
         uint8_t colors;
@@ -73,7 +73,7 @@ typedef struct {
 
 typedef union {
     uint32_t w;
-    struct packed {
+    struct __attribute__((packed)) {
         uint8_t red;
         uint8_t green;
         uint8_t blue;
@@ -93,11 +93,11 @@ typedef struct {
     union
     {
         uint32_t w;
-        struct packed
-        {
+        struct __attribute__((packed)) {
             unsigned bufferFilling:1;
-            unsigned bufferTransmitting:1; /* if transmitting, false is buffer 0 is  */
-                                    /* being DMAed from, true is buffer 1 */ 
+            unsigned bufferTransmitting:1; /* while transmitting, false/0     */ 
+                                            /* means buffer 0 is the DMA data */
+                                            /* source, true/1 means buffer 1  */ 
             unsigned :30;            
         };
     }status;

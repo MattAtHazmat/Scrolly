@@ -114,7 +114,7 @@ typedef struct{
     }timer;
     union{
         uint32_t w;
-        struct packed {
+        struct __attribute__((packed)) {
             unsigned readyForNext:1;
             unsigned SPIReady:1;
             unsigned SysTimerReady:1;

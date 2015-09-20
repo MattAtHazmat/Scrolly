@@ -73,6 +73,10 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "driver/ethmac/drv_ethmac.h"
 #include "driver/wifi/mrf24w/drv_wifi.h"
 #include "tcpipstack.h"
+/* this needs to be included before anything I've got defined: */
+//#ifndef packed
+//    #define packed (__attribute__((packed)))
+//#endif
 #include "ledscroller.h"
 
 

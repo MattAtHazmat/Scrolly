@@ -91,19 +91,13 @@ LED_DISPLAY_TYPE LEDDisplay;
 // *****************************************************************************
 // *****************************************************************************
 
-// Comment a function definition and leverage automatic documentation 
-/**
-  <p><b>Function:</b></p>
-
-  <p><b>Summary:</b></p>
-
-  <p><b>Description:</b></p>
-
-  <p><b>Remarks:</b></p>
- */
-// TODO Insert function definitions (right here) to leverage live documentation
 /******************************************************************************/
-
+/**
+ <p><i>returnType</i> <b>Function</b>(<i>parameterType</i> <u>parameter</u>, ...)</p>
+ <p><b>Summary:</b> Summary here</p> 
+ <p><b>Description:</b> Description here.</p>
+ <p><b>Remarks:</b> remarks here. </p> 
+**/
 bool InitializeLEDDisplay(DISPLAY_TYPE *pDisplay)
 {
     memset(&LEDDisplay,0,sizeof(LEDDisplay));
@@ -128,7 +122,7 @@ bool InitializeLEDDisplay(DISPLAY_TYPE *pDisplay)
         {
             sampleString[index]=character;
         }  
-        strcpy(pDisplay->characterString,sampleString);    
+        strcpy((char*)pDisplay->characterString,(char*)sampleString);    
     }
     
     pDisplay->stringColumns = 
@@ -136,14 +130,26 @@ bool InitializeLEDDisplay(DISPLAY_TYPE *pDisplay)
             pDisplay->info.proportional);
     return true;
 }
-
+/******************************************************************************/
+/**
+ <p><i>returnType</i> <b>Function</b>(<i>parameterType</i> <u>parameter</u>, ...)</p>
+ <p><b>Summary:</b> Summary here</p> 
+ <p><b>Description:</b> Description here.</p>
+ <p><b>Remarks:</b> remarks here. </p> 
+**/
 void FinishedLEDWriteCB(DRV_SPI_BUFFER_EVENT event, 
                         DRV_SPI_BUFFER_HANDLE bufferHandle, 
                         void * context)
 {
     LEDDisplay.transmitting=false;
 }
-
+/******************************************************************************/
+/**
+ <p><i>returnType</i> <b>Function</b>(<i>parameterType</i> <u>parameter</u>, ...)</p>
+ <p><b>Summary:</b> Summary here</p> 
+ <p><b>Description:</b> Description here.</p>
+ <p><b>Remarks:</b> remarks here. </p> 
+**/
 bool GenerateColorMap(DISPLAY_TYPE *pDisplay)
 {
     /* make the color map */
@@ -172,12 +178,27 @@ bool GenerateColorMap(DISPLAY_TYPE *pDisplay)
     pDisplay->colorMap[7].blue=0x00;
     return true;
 }
+/******************************************************************************/
+/**
+ <p><i>bool</i> <b>SendingToDisplay</b>(<i>void</i>)</p>
+ <p><b>Summary:</b> Sending to the display?</p> 
+ <p><b>Description:</b> Returns true/false to show if we're sending to the
+ * display or not.</p>
+ <p><b>Remarks:</b> Accessor- possibly have interrupt exclusion if this becomes 
+ * necessary. </p> 
+**/
 bool SendingToDisplay(void)
 {
     return LEDDisplay.transmitting;
 }
 
 /******************************************************************************/
+/**
+ <p><i>returnType</i> <b>Function</b>(<i>parameterType</i> <u>parameter</u>, ...)</p>
+ <p><b>Summary:</b> Summary here</p> 
+ <p><b>Description:</b> Description here.</p>
+ <p><b>Remarks:</b> remarks here. </p> 
+**/
 
 uint32_t PopulateDisplay(DISPLAY_TYPE *pDisplay)
 {
@@ -269,7 +290,12 @@ uint32_t PopulateDisplay(DISPLAY_TYPE *pDisplay)
 }
 
 /******************************************************************************/
-
+/**
+ <p><i>returnType</i> <b>Function</b>(<i>parameterType</i> <u>parameter</u>, ...)</p>
+ <p><b>Summary:</b> Summary here</p> 
+ <p><b>Description:</b> Description here.</p>
+ <p><b>Remarks:</b> remarks here. </p> 
+**/
 void PopulatePixel(RGB_COLOR_TYPE pixelColor, uint32_t *toSendIndex, uint8_t *toSend )
 {
     uint8_t mask=0x80;    
@@ -314,7 +340,12 @@ void PopulatePixel(RGB_COLOR_TYPE pixelColor, uint32_t *toSendIndex, uint8_t *to
 }
 
 /******************************************************************************/
-
+/**
+ <p><i>returnType</i> <b>Function</b>(<i>parameterType</i> <u>parameter</u>, ...)</p>
+ <p><b>Summary:</b> Summary here</p> 
+ <p><b>Description:</b> Description here.</p>
+ <p><b>Remarks:</b> remarks here. </p> 
+**/
 void SendDisplay(DISPLAY_TYPE *pDisplay)
 {
     DRV_SPI_BufferAddWrite (pDisplay->SPIHandle,
@@ -327,7 +358,12 @@ void SendDisplay(DISPLAY_TYPE *pDisplay)
 }
 
 /******************************************************************************/
-
+/**
+ <p><i>returnType</i> <b>Function</b>(<i>parameterType</i> <u>parameter</u>, ...)</p>
+ <p><b>Summary:</b> Summary here</p> 
+ <p><b>Description:</b> Description here.</p>
+ <p><b>Remarks:</b> remarks here. </p> 
+**/
 uint8_t* QueueDisplay(DISPLAY_TYPE *pDisplay)
 {
     return &LEDDisplay.rawLED[LEDDisplay.status.bufferFilling][0];

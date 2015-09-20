@@ -81,7 +81,7 @@
 
 typedef union {
     uint8_t w;
-    struct packed {
+    struct __attribute__((packed)) {
         unsigned start:4;
         unsigned end:4;
     };

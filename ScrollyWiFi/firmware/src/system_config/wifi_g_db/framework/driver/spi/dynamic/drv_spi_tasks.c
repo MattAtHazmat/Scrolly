@@ -43,11 +43,11 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 (INCLUDING BUT NOT LIMITED TO ANY DEFENSE THEREOF), OR OTHER SIMILAR COSTS.
 *******************************************************************************/
 //DOM-IGNORE-END
-#ifdef USE_CUSTOM_DRV_SPI_INTERNAL_H
-#include "drv_spi_internal.h"
-#else
-#include "driver/spi/src/dynamic/drv_spi_internal.h"
-#endif
+//#ifdef USE_CUSTOM_DRV_SPI_INTERNAL_H
+//#include <drv_spi_internal.h>
+//#else
+#include <driver/spi/src/dynamic/drv_spi_internal.h>
+//#endif
 #include <stdbool.h>
 
 // DMA Scratch Pad
@@ -781,16 +781,17 @@ void DRV_SPI_SetupDMA( struct DRV_SPI_DRIVER_OBJECT * pDrvInstance)
 
         DMA_TRIGGER_SOURCE txSource = 0;
         DMA_TRIGGER_SOURCE rxSource = 0;
-        DMA_TRIGGER_SOURCE errSource = 0;
+        //DMA_TRIGGER_SOURCE errSource = 0;
 
         switch(pDrvInstance->spiId)
         {
-#if (DRV_SPI_NUMBER_OF_MODULES > 0)
+            /* the '695 doesn't have SPI_ID_1 */
+#if (DRV_SPI_NUMBER_OF_MODULES > 0) && !(defined(_SPI_P32MX695F512H_H))
             case SPI_ID_1:
             {
                 txSource = DMA_TRIGGER_SPI_1_TRANSMIT;
                 rxSource = DMA_TRIGGER_SPI_1_RECEIVE;
-                errSource = DMA_TRIGGER_SPI_1_ERROR;
+                //errSource = DMA_TRIGGER_SPI_1_ERROR;
             }
             break;
 #endif
@@ -799,7 +800,7 @@ void DRV_SPI_SetupDMA( struct DRV_SPI_DRIVER_OBJECT * pDrvInstance)
             {
                 txSource = DMA_TRIGGER_SPI_2_TRANSMIT;
                 rxSource = DMA_TRIGGER_SPI_2_RECEIVE;
-                errSource = DMA_TRIGGER_SPI_2_ERROR;
+                //errSource = DMA_TRIGGER_SPI_2_ERROR;
             }
             break;
 #endif
@@ -808,7 +809,7 @@ void DRV_SPI_SetupDMA( struct DRV_SPI_DRIVER_OBJECT * pDrvInstance)
             {
                 txSource = DMA_TRIGGER_SPI_3_TRANSMIT;
                 rxSource = DMA_TRIGGER_SPI_3_RECEIVE;
-                errSource = DMA_TRIGGER_SPI_3_ERROR;
+                //errSource = DMA_TRIGGER_SPI_3_ERROR;
             }
             break;
 #endif

@@ -44,6 +44,7 @@
             <logicalFolder name="f1" displayName="private" projectFiles="true">
               <logicalFolder name="f1" displayName="dynamic" projectFiles="true">
                 <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/spi/src/dynamic/drv_spi_internal.h</itemPath>
+                <itemPath>../src/system_config/wifi_g_db/framework/driver/spi/src/dynamic/drv_spi_internal.h</itemPath>
               </logicalFolder>
               <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/spi/src/drv_spi_sys_queue.h</itemPath>
               <itemPath>../../../../../microchip/harmony/v1_06/framework/driver/spi/src/drv_spi_sys_queue_local_fifo.h</itemPath>
@@ -166,7 +167,6 @@
           <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/tcpip_ethernet.h</itemPath>
         </logicalFolder>
       </logicalFolder>
-      <itemPath>../../drv_spi_internal.h</itemPath>
       <itemPath>../../FirmwareConfiguration.h</itemPath>
       <itemPath>../../HardwareConfiguration.h</itemPath>
       <itemPath>../../TM1804.h</itemPath>
@@ -449,7 +449,7 @@
         <property key="enable-unroll-loops" value="false"/>
         <property key="exclude-floating-point" value="false"/>
         <property key="extra-include-directories"
-                  value="..;../..;../src;../src/system_config/wifi_g_db;../src/system_config/wifi_g_db/framework;../../../../../microchip/harmony/v1_06/framework;..\..\..\..\..\microchip\harmony\v1_06\bsp\wifi_g_db"/>
+                  value="..;../..;../src;../src/system_config/wifi_g_db;../src/system_config/wifi_g_db/framework;C:\Projects\Scrolly\ScrollyWiFi\firmware\src\system_config\wifi_g_db\framework;c:/microchip/harmony/v1_06/framework;c:/microchip/harmony/v1_06/bsp/wifi_g_db"/>
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="true"/>

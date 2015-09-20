@@ -72,7 +72,7 @@
 /******************************************************************************/
 typedef union {
     uint32_t w;
-    struct packed { 
+    struct __attribute__((packed)) { 
         uint8_t red;
         uint8_t green;
         uint8_t blue;
@@ -82,7 +82,7 @@ typedef union {
 
 typedef union {
     uint32_t w;
-    struct packed {
+    struct __attribute__((packed)) {
         uint8_t hue;
         uint8_t saturation;
         uint8_t value;
