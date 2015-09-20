@@ -43,7 +43,11 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 (INCLUDING BUT NOT LIMITED TO ANY DEFENSE THEREOF), OR OTHER SIMILAR COSTS.
 *******************************************************************************/
 //DOM-IGNORE-END
+#ifdef USE_CUSTOM_DRV_SPI_INTERNAL_H
+#include "drv_spi_internal.h"
+#else
 #include "driver/spi/src/dynamic/drv_spi_internal.h"
+#endif
 #include <stdbool.h>
 
 // DMA Scratch Pad
