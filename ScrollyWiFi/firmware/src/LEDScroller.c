@@ -182,7 +182,7 @@ void TimerCallback ( uintptr_t context, uint32_t currTick )
     void LEDSCROLLER_Initialize ( void )
 
   Remarks:
-    See prototype in ledscroller.h.
+    See prototype in LEDScroller.h.
  */
 
 void LEDSCROLLER_Initialize ( void )

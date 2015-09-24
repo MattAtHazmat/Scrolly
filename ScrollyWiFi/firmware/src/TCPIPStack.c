@@ -53,7 +53,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 
-#include "tcpipstack.h"
+#include "TCPIPStack.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -108,7 +108,7 @@ TCPIPSTACK_DATA tcpipstackData;
     void TCPIPSTACK_Initialize ( void )
 
   Remarks:
-    See prototype in tcpipstack.h.
+    See prototype in TCPIPStack.h.
  */
 
 void TCPIPSTACK_Initialize ( void )
@@ -127,7 +127,7 @@ void TCPIPSTACK_Initialize ( void )
     void TCPIPSTACK_Tasks ( void )
 
   Remarks:
-    See prototype in tcpipstack.h.
+    See prototype in TCPIPStack.h.
  */
 
 void TCPIPSTACK_Tasks ( void )

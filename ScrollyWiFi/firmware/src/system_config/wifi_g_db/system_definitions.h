@@ -72,12 +72,12 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "tcpip/tcpip.h"
 #include "driver/ethmac/drv_ethmac.h"
 #include "driver/wifi/mrf24w/drv_wifi.h"
-#include "tcpipstack.h"
+#include "TCPIPStack.h"
 /* this needs to be included before anything I've got defined: */
 //#ifndef packed
 //    #define packed (__attribute__((packed)))
 //#endif
-#include "ledscroller.h"
+#include "LEDScroller.h"
 
 
 // DOM-IGNORE-BEGIN

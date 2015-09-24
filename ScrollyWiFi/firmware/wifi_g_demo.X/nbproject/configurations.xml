@@ -416,7 +416,7 @@
         <platformTool>Simulator</platformTool>
         <languageToolchain>XC32</languageToolchain>
         <languageToolchainVersion>1.40</languageToolchainVersion>
-        <platform>3</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
@@ -449,7 +449,7 @@
         <property key="enable-unroll-loops" value="false"/>
         <property key="exclude-floating-point" value="false"/>
         <property key="extra-include-directories"
-                  value="..;../..;../src;../src/system_config/wifi_g_db;../src/system_config/wifi_g_db/framework;C:\Projects\Scrolly\ScrollyWiFi\firmware\src\system_config\wifi_g_db\framework;c:/microchip/harmony/v1_06/framework;c:/microchip/harmony/v1_06/bsp/wifi_g_db"/>
+                  value="..;../..;../src;../src/system_config/wifi_g_db;../src/system_config/wifi_g_db/framework;../../../../../microchip/harmony/v1_06/framework;../../../../../microchip/harmony/v1_06/bsp;../../../../../microchip/harmony/v1_06/bsp/wifi_g_db"/>
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="true"/>

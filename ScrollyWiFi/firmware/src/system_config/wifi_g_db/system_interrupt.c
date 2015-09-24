@@ -62,8 +62,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 #include <xc.h>
 #include <sys/attribs.h>
-#include "tcpipstack.h"
-#include "ledscroller.h"
+#include "TCPIPStack.h"
+#include "LEDScroller.h"
 #include "system_definitions.h"
 
 // *****************************************************************************
