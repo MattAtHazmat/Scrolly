@@ -684,7 +684,7 @@
       <Template>
         <Name>system_init.c</Name>
         <Path>Source Files/app/system_config/wifi_g_db</Path>
-        <Checksum>D174F95E04B3070032444A7EC009603A</Checksum>
+        <Checksum>212E040F9A79E8EA25ADD3D199902F42</Checksum>
       </Template>
       <Template>
         <Name>sys_ports_static.c</Name>
@@ -699,7 +699,7 @@
       <Template>
         <Name>system_tasks.c</Name>
         <Path>Source Files/app/system_config/wifi_g_db</Path>
-        <Checksum>D3134BD6497473D900BD15DF6E4C7B60</Checksum>
+        <Checksum>13ACE2DEA9E2E49FF8DA00D033211FC4</Checksum>
       </Template>
       <Template>
         <Name>system_exceptions.c</Name>
@@ -770,12 +770,12 @@
       <Template>
         <Name>system_interrupt.c</Name>
         <Path>Source Files/app/system_config/wifi_g_db</Path>
-        <Checksum>DCF52CD39E266F97CDFA3185535F6DAA</Checksum>
+        <Checksum>F7A221C2A80A629A8DF5AFFAC43BC2B3</Checksum>
       </Template>
       <Template>
         <Name>system_config.h</Name>
         <Path>Header Files/app/system_config/wifi_g_db</Path>
-        <Checksum>955E63681E63B55C05260B46159B291D</Checksum>
+        <Checksum>2290EC16F0236CEDAD57F077CF43C346</Checksum>
       </Template>
     </Templates>
     <CompilerItems>

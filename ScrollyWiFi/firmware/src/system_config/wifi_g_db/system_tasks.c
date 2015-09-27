@@ -82,6 +82,7 @@ void SYS_Tasks ( void )
     /* Maintain Device Drivers */
         DRV_TMR_Tasks(sysObj.drvTmr0);
         DRV_TMR_Tasks(sysObj.drvTmr1);
+    DRV_SPI_Tasks(sysObj.spiObjectIdx1);
 
     /* Maintain Middleware & Other Libraries */
     /* Maintain the TCP/IP Stack*/

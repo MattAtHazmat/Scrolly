@@ -50,7 +50,8 @@
 #define HUE_INCREMENT           (1)
 #define INTENSITY               (0x0a)
 
-
+#define DISPLAY_SPI_DRIVER      DRV_SPI_INDEX_1
+#define DISPLAY_TIMER_DRIVER    DRV_TMR_INDEX_1
 
 //#define COLOR_TEST
 

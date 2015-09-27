@@ -217,20 +217,13 @@ void LEDSCROLLER_Tasks ( void )
             }            
             if(LEDScrollerData.status.SPIReady==false)
             {
-                LEDScrollerData.display.SPIHandle = DRV_SPI_Open(DRV_SPI_INDEX_0,
-                                                    DRV_IO_INTENT_EXCLUSIVE |
-                                                    DRV_IO_INTENT_WRITE |
-                                                    DRV_IO_INTENT_NONBLOCKING
-                                               );     
+                LEDScrollerData.display.SPIHandle = DRV_SPI_Open(DISPLAY_SPI_DRIVER, DRV_IO_INTENT_EXCLUSIVE | DRV_IO_INTENT_WRITE | DRV_IO_INTENT_NONBLOCKING);     
                 LEDScrollerData.status.SPIReady = ( DRV_HANDLE_INVALID != LEDScrollerData.display.SPIHandle );
             }
             if(LEDScrollerData.status.TimerDriverReady==false)
             {
-                LEDScrollerData.timer.driver.handle = DRV_TMR_Open(
-                        DRV_TMR_INDEX_0,
-                        DRV_IO_INTENT_READWRITE|DRV_IO_INTENT_EXCLUSIVE);
-                LEDScrollerData.status.TimerDriverReady = 
-                        (LEDScrollerData.timer.driver.handle != DRV_HANDLE_INVALID);
+                LEDScrollerData.timer.driver.handle = DRV_TMR_Open(DISPLAY_TIMER_DRIVER,DRV_IO_INTENT_READWRITE|DRV_IO_INTENT_EXCLUSIVE);
+                LEDScrollerData.status.TimerDriverReady = (LEDScrollerData.timer.driver.handle != DRV_HANDLE_INVALID);
             }     
             if(LEDScrollerData.status.SPIReady && LEDScrollerData.status.TimerDriverReady)
             {
