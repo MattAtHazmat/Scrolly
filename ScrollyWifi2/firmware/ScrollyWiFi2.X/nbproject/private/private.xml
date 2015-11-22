@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/home/mjb/Projects/Scrolly/ScrollyWifi2/firmware/src/system_config/wifi_g_db/framework/driver/spi/dynamic/drv_spi_tasks.c</file>
+            <file>file:/home/mjb/Projects/Scrolly/ScrollyWifi2/firmware/src/main.c</file>
+            <file>file:/home/mjb/microchip/harmony/v1_06/framework/system/console/sys_console.h</file>
+            <file>file:/home/mjb/Projects/Scrolly/ScrollyWifi2/firmware/src/app.c</file>
+            <file>file:/home/mjb/Projects/Scrolly/ScrollyWifi2/firmware/src/system_config/wifi_g_db/framework/system/console/src/sys_console_static.c</file>
+            <file>file:/home/mjb/microchip/harmony/v1_06/framework/driver/wifi/mrf24w/src/drv_wifi_power_save.c</file>
+            <file>file:/home/mjb/Projects/Scrolly/ScrollyWifi2/firmware/src/scroller.c</file>
+            <file>file:/home/mjb/microchip/harmony/v1_06/framework/driver/wifi/mrf24w/src/drv_wifi_debug_output.c</file>
+            <file>file:/home/mjb/microchip/harmony/v1_06/framework/driver/wifi/mrf24w/src/drv_wifi_com.c</file>
+            <file>file:/home/mjb/Projects/Scrolly/ScrollyWifi2/firmware/src/ASCII.c</file>
+            <file>file:/home/mjb/Projects/Scrolly/ScrollyWifi2/firmware/src/system_config/wifi_g_db/system_config.h</file>
+        </group>
+    </open-files>
+</project-private>
