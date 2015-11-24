@@ -1,3 +1,4 @@
+// <editor-fold defaultstate="collapsed" desc="SLA">
 /*******************************************************************************
   SPI Driver Functions for Dynamic Driver Tasks Functions
 
@@ -17,7 +18,7 @@
     
   Remarks:
   This file is generated from framework/driver/spi/template/drv_spi_dynamic_tasks.c.ftl
-*******************************************************************************/
+ *******************************************************************************/
 
 //DOM-IGNORE-BEGIN
 /*******************************************************************************
@@ -41,8 +42,8 @@ INCLUDING BUT NOT LIMITED TO ANY INCIDENTAL, SPECIAL, INDIRECT, PUNITIVE OR
 CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, COST OF PROCUREMENT OF
 SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 (INCLUDING BUT NOT LIMITED TO ANY DEFENSE THEREOF), OR OTHER SIMILAR COSTS.
-*******************************************************************************/
-//DOM-IGNORE-END
+ *******************************************************************************/
+//DOM-IGNORE-END// </editor-fold>
 // use custom drv_spi_internal.h
 //#include "driver/spi/src/dynamic/drv_spi_internal.h"
 #include "drv_spi_internal.h"

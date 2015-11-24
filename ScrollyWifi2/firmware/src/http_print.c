@@ -59,6 +59,7 @@ void TCPIP_HTTP_Print_privacy(HTTP_CONN_HANDLE connHandle);
 void TCPIP_HTTP_Print_wlan(HTTP_CONN_HANDLE connHandle);
 void TCPIP_HTTP_Print_strength(HTTP_CONN_HANDLE connHandle);
 void TCPIP_HTTP_Print_btn(HTTP_CONN_HANDLE connHandle,uint16_t);
+void TCPIP_HTTP_Print_currString(HTTP_CONN_HANDLE connHandle);
 
 void TCPIP_HTTP_Print(HTTP_CONN_HANDLE connHandle,uint32_t callbackID)
 {
@@ -131,6 +132,9 @@ TCP_SOCKET sktHTTP;
         case 0x00000015:
 			TCPIP_HTTP_Print_btn(connHandle,0);
 			break;
+        case 0x00000016:
+			TCPIP_HTTP_Print_currString(connHandle);
+			break;
 		default:
 			// Output notification for undefined values
                        sktHTTP = TCPIP_HTTP_CurrentConnectionSocketGet(connHandle);
@@ -146,3 +150,4 @@ void TCPIP_HTTP_Print_(HTTP_CONN_HANDLE connHandle)
 	TCPIP_TCP_Put(sktHTTP, '~');
 	return;
 }
+

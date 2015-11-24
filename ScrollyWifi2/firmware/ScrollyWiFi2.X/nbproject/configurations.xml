@@ -188,6 +188,25 @@
           <itemPath>../../../../../microchip/harmony/v1_06/framework/tcpip/tcpip_ethernet.h</itemPath>
         </logicalFolder>
       </logicalFolder>
+      <itemPath>../src/debug.h</itemPath>
+      <itemPath>../src/FirmwareConfiguration.h</itemPath>
+      <itemPath>../src/HardwareConfiguration.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="f1" displayName="HTML" projectFiles="true">
+      <itemPath>../src/web_pages/DynRcrd.bin</itemPath>
+      <itemPath>../src/web_pages/FileRcrd.bin</itemPath>
+      <itemPath>../src/web_pages/configure.htm</itemPath>
+      <itemPath>../src/web_pages/error.htm</itemPath>
+      <itemPath>../src/web_pages/favicon.ico</itemPath>
+      <itemPath>../src/web_pages/footer.inc</itemPath>
+      <itemPath>../src/web_pages/header.inc</itemPath>
+      <itemPath>../src/web_pages/index.htm</itemPath>
+      <itemPath>../src/web_pages/leds.cgi</itemPath>
+      <itemPath>../src/web_pages/mchp.css</itemPath>
+      <itemPath>../src/web_pages/mchp.js</itemPath>
+      <itemPath>../src/web_pages/reconnect.htm</itemPath>
+      <itemPath>../src/web_pages/scan.cgi</itemPath>
+      <itemPath>../src/web_pages/status.xml</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -243,6 +262,7 @@
         <itemPath>../src/custom_http_app.c</itemPath>
         <itemPath>../src/mpfs_img2.c</itemPath>
         <itemPath>../src/scroller.c</itemPath>
+        <itemPath>../src/debug.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f2" displayName="bsp" projectFiles="true">
         <logicalFolder name="f1" displayName="wifi_g_db" projectFiles="true">
@@ -421,7 +441,7 @@
         <platformTool>RealICEPlatformTool</platformTool>
         <languageToolchain>XC32</languageToolchain>
         <languageToolchainVersion>1.40</languageToolchainVersion>
-        <platform>2</platform>
+        <platform>3</platform>
       </toolsSet>
       <compileType>
         <linkerTool>

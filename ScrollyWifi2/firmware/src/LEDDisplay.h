@@ -45,7 +45,7 @@
 #define SIMULTANEOUS_COLORS (8)
 #define MAP_MASK    (0b00000111) /* log base2 of SIMULTANEOUS_COLORS */
 
-#define DISPLAY_STRING_LENGTH   (0xff)
+
 #define DISPLAY_NUMBER_PIXELS   (DISPLAY_NUMBER_COLUMNS*DISPLAY_NUMBER_ROWS)
 #define RAW_BUFFER_SIZE         ((3*8*DISPLAY_NUMBER_PIXELS)+LED_STRIP_RESET_BITS)
 
@@ -113,6 +113,7 @@ uint8_t* QueueDisplay(DISPLAY_TYPE*);
 void SendDisplay(DISPLAY_TYPE*);
 uint32_t PopulateDisplay(DISPLAY_TYPE *);
 bool SendingToDisplay(void);
+//char* GetpDisplayString(DISPLAY_TYPE *pDisplay);
 
 #endif	/* LEDDISPLAY_H */
 

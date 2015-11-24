@@ -20,3 +20,4 @@
 +led(1)
 +led(2)
 +btn(0)
++currString

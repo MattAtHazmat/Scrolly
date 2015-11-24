@@ -139,7 +139,6 @@ void SCROLLER_Tasks ( void )
     {
         case SCROLLER_STATE_INIT:
         {
-            break;
             /* start up the SPI and timer drivers */
             if(scrollerData.status.ready)
             {
@@ -148,7 +147,7 @@ void SCROLLER_Tasks ( void )
             }            
             if(scrollerData.status.SPIReady==false)
             {
-                scrollerData.display.SPIHandle = DRV_SPI_Open(DRV_SPI_INDEX_0,
+                scrollerData.display.SPIHandle = DRV_SPI_Open(SCROLLER_SPI_DRIVER,
                                                     DRV_IO_INTENT_EXCLUSIVE |
                                                     DRV_IO_INTENT_WRITE |
                                                     DRV_IO_INTENT_NONBLOCKING
@@ -158,7 +157,7 @@ void SCROLLER_Tasks ( void )
             if(scrollerData.status.TimerDriverReady==false)
             {
                 scrollerData.timer.driver.handle = DRV_TMR_Open(
-                        DRV_TMR_INDEX_0,
+                        SCROLLER_TIMER_DRIVER,
                         DRV_IO_INTENT_READWRITE|DRV_IO_INTENT_EXCLUSIVE);
                 scrollerData.status.TimerDriverReady = 
                         (scrollerData.timer.driver.handle != DRV_HANDLE_INVALID);
@@ -204,11 +203,13 @@ void SCROLLER_Tasks ( void )
                 uint8_t characterIndex=0;
                 scrollerData.display.stringOffsetColumn = scrollerData.display.info.columns;
                 characterColor = scrollerData.display.characterColor[0];
+                /* don't let the display be the background color */
                 do
                 {
                     characterColor++;
                     characterColor &= MAP_MASK;
                 } while (characterColor==scrollerData.display.backgroundColor);
+                /* set all the characters to the same color.    */
                 while(scrollerData.display.characterString[characterIndex])
                 {
                     scrollerData.display.characterColor[characterIndex++] = characterColor;

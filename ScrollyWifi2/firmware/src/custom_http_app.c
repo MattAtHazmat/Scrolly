@@ -48,6 +48,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "tcpip/src/common/helpers.h"
 
 #include "tcpip/src/tcpip_private.h"
+#include "LEDDisplay.h"
 
 /****************************************************************************
   Section:
@@ -109,6 +110,7 @@ static bool lastSuccess = false;
 // Stick status message variable.  See lastSuccess for details.
 static bool lastFailure = false;
 
+extern DISPLAY_TYPE LEDDisplay;
 /****************************************************************************
   Section:
     Helper Functions
@@ -2639,4 +2641,14 @@ void TCPIP_HTTP_Print_ipaddr(HTTP_CONN_HANDLE connHandle)
     TCPIP_TCP_StringPut(sktHTTP, (uint8_t*)ipAddrDisplay);
 }
 
+void TCPIP_HTTP_Print_currString(HTTP_CONN_HANDLE connHandle)
+{
+    char scrollerDisplay[DISPLAY_STRING_LENGTH];
+    TCP_SOCKET sktHTTP;
+    sktHTTP = TCPIP_HTTP_CurrentConnectionSocketGet(connHandle);
+
+    TCPIP_NET_HANDLE netH = TCPIP_TCP_SocketNetGet(sktHTTP);
+    strcpy(&scrollerDisplay,&LEDDisplay.characterString);//  GetpDisplayString(&LEDDisplay));
+    TCPIP_TCP_StringPut(sktHTTP, (char*)scrollerDisplay);
+}
 #endif

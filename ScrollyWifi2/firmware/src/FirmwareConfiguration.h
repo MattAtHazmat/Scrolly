@@ -39,7 +39,7 @@
 // Section: Constants and Type Definitions.
 // *****************************************************************************
 
-#define STRIP_OUT_5V
+//#define STRIP_OUT_5V
 #define ACTIVITY_LED_INTERVAL   10000
 #define MAX_AMP                 (100)
 #define MIN_AMP                 (1)
@@ -50,7 +50,9 @@
 #define HUE_INCREMENT           (1)
 #define INTENSITY               (0x0a)
 
-
+#define SCROLLER_SPI_DRIVER     DRV_SPI_INDEX_1
+#define SCROLLER_TIMER_DRIVER   DRV_TMR_INDEX_1
+#define DISPLAY_STRING_LENGTH   (50)
 
 //#define COLOR_TEST
 

@@ -1,3 +1,4 @@
+// <editor-fold defaultstate="collapsed" desc="SLA">
 /*******************************************************************************
   MPLAB Harmony System Configuration Header
 
@@ -19,7 +20,7 @@
     until used by another MPLAB Harmony module or application.
     
     Created with MPLAB Harmony Version 1.06
-*******************************************************************************/
+ *******************************************************************************/
 
 // DOM-IGNORE-BEGIN
 /*******************************************************************************
@@ -43,8 +44,8 @@ INCLUDING BUT NOT LIMITED TO ANY INCIDENTAL, SPECIAL, INDIRECT, PUNITIVE OR
 CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, COST OF PROCUREMENT OF
 SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 (INCLUDING BUT NOT LIMITED TO ANY DEFENSE THEREOF), OR OTHER SIMILAR COSTS.
-*******************************************************************************/
-// DOM-IGNORE-END
+ *******************************************************************************/
+// DOM-IGNORE-END// </editor-fold>
 
 #ifndef _SYSTEM_CONFIG_H
 #define _SYSTEM_CONFIG_H
@@ -64,8 +65,14 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 /*  This section Includes other configuration headers necessary to completely
     define this configuration.
 */
+#ifndef SYS_ASSERT
+    #define SYS_ASSERT              DebugAssert
+    #define SYS_ASSERT_CUSTOM
+#endif
 
+#include "debug.h"
 #include "bsp_config.h"
+
 #include "../../../../../private.h"
 // *****************************************************************************
 // *****************************************************************************
@@ -107,7 +114,9 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define SYS_CONSOLE_DEVICE_MAX_INSTANCES        1
 #define SYS_CONSOLE_INSTANCES_NUMBER            1
 
-#define SYS_CONSOLE_PRINT DBPRINTF
+#define SYS_CONSOLE_PRINT       DBPRINTF
+
+
 /*** File System Service Configuration ***/
 
 #define SYS_FS_MEDIA_NUMBER         	1

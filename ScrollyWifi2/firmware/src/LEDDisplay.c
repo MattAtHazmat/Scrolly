@@ -117,25 +117,31 @@ bool InitializeLEDDisplay(DISPLAY_TYPE *pDisplay)
     pDisplay->info.colors = SIMULTANEOUS_COLORS;
     pDisplay->info.proportional = true;
     pDisplay->stringOffsetColumn = pDisplay->info.columns; 
-    //strcpy(pDisplay->characterString,"Hello world!");
-    {
-        uint8_t character;
-        uint8_t index;
-        uint8_t sampleString[DISPLAY_STRING_LENGTH];
-        for(index=0,character=ASCII_OFFSET;
-            (character<=MAX_DEFINED_CHARACTER)&&(index<=(DISPLAY_STRING_LENGTH));
-             character++,index++)
-        {
-            sampleString[index]=character;
-        }  
-        strcpy((char*)pDisplay->characterString,(char*)sampleString);    
-    }
-    
+    strcpy(pDisplay->characterString,"Hello world!");
+//    {
+//        uint8_t character;
+//        uint8_t index;
+//        uint8_t sampleString[DISPLAY_STRING_LENGTH];
+//        for(index=0,character=ASCII_OFFSET;
+//            (character<=MAX_DEFINED_CHARACTER)&&(index<(DISPLAY_STRING_LENGTH-1));
+//             character++,index++)
+//        {
+//            sampleString[index]=character;
+//        }  
+//        /* null terminate the string */
+//        sampleString[index]=0;
+//        strcpy((char*)pDisplay->characterString,(char*)sampleString);    
+//    }    
     pDisplay->stringColumns = 
             GetMessageColumnWidth(pDisplay->characterString,
             pDisplay->info.proportional);
     return true;
 }
+
+//char* GetpDisplayString(DISPLAY_TYPE *pDisplay)
+//{
+//    return &(pDisplay->characterString);
+//}
 
 void FinishedLEDWriteCB(DRV_SPI_BUFFER_EVENT event, 
                         DRV_SPI_BUFFER_HANDLE bufferHandle, 

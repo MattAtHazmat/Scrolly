@@ -12,12 +12,11 @@
 <div id="shadow-one"><div id="shadow-two"><div id="shadow-three"><div id="shadow-four">
 <div id="page">
 
-<div style="padding:0 0 65px 5px"><img src="images/mchp.gif" alt="Microchip" align="left"/><img src="images/harmony.gif" alt="Harmony" align="right"/></div>
+<div style="padding:0 0 150px 5px"><img src="images/hazmat150x137.png" alt="hazmat" height="137" width="150" align="left"/><img src="images/hazmat150x137.png" alt="hazmat" height="137" width="150" align="right"/></div>
 
-<div id="title"><div class="right">Microchip Wi-Fi G Demo Application</div><span id="hello">&nbsp;</span></div>
+<div id="title"><div class="right">Scrolly</div><span id="hello">&nbsp;</span></div>
 
 <div id="menu">
-    <a href="/index.htm">Overview</a>
-    <a href="/mrf24wg.htm">MRF24WG0MA/MB</a>
+    <a href="/index.htm">Main</a>
     <a href="/configure.htm">Network Configuration</a>
 </div>
