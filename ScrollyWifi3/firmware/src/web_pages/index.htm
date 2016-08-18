@@ -1,0 +1,152 @@
+~inc:header.inc~
+<div id="content">
+
+<h1>Welcome!</h1>
+
+<p></p>You are currently connected to:</p>
+
+<table style="padding-left: 10px;">
+<tr>
+    <td>
+        <b>SSID:</b>
+    </td>
+    <td>
+        &nbsp;
+    </td>
+    <td>
+        ~ssid~
+    </td>
+</tr>
+<tr>
+    <td>
+        <b>Security Type:</b>
+    </td>
+    <td>
+        &nbsp;
+    </td>
+    <td>
+        ~currPrivacy~
+    </td>
+</tr>
+<tr>
+    <td>
+        <b>WLAN Type:</b>
+    </td>
+    <td>
+        &nbsp;
+    </td>
+    <td>
+        ~currWLAN~
+    </td>
+</tr>
+<tr>
+    <td>
+        <b>IP Address:</b>
+    </td>
+    <td>
+        &nbsp;
+    </td>
+    <td>
+        ~ipaddr~
+    </td>
+</tr>
+<tr>
+    <td>
+        <b>Module FW Version:</b>
+    </td>
+    <td>
+        &nbsp;
+    </td>
+    <td>
+        ~fwver~
+    </td>
+</tr>
+<tr>
+    <td>
+        <b>Build Date:</b>
+    </td>
+    <td>
+        &nbsp;
+    </td>
+    <td>
+        ~builddate~
+    </td>
+</tr>
+</table>
+<BR>
+<FORM action="index.htm" method="post">
+    <div>
+        <label>
+            New Message:
+        </label>
+        <textarea name="msg" columns="50" rows="1">~message~</textarea>
+    </div>
+    <div>
+        <table>
+            <tr>
+                <td><label>Character Color</label></td>  
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td><label>Background Color</label></td>
+            </tr> 
+            <tr>
+                <td><INPUT type="radio" name="fgc" value="red"~fgred~>Red</td>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td><INPUT type="radio" name="bgc" value="red"~bgred~>Red</td>
+            </tr>
+            <tr>
+                <td><INPUT type="radio" name="fgc" value="green"~fggreen~>Green</td>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td><INPUT type="radio" name="bgc" value="green"~bggreen~>Green</td>  
+            </tr>
+            <tr>
+                <td><INPUT type="radio" name="fgc" value="blue"~fgblue~>Blue</td>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td><INPUT type="radio" name="bgc" value="blue"~bgblue~>Blue</td>
+            </tr>
+            <tr>
+                <td><INPUT type="radio" name="fgc" value="black"~fgblack~>Black</td>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td><INPUT type="radio" name="bgc" value="black"~bgblack~>Black</td>
+            </tr>
+            <tr>
+                <td><INPUT type="radio" name="fgc" value="white"~fgwhite~>White</td>                
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td><INPUT type="radio" name="bgc" value="white"~bgwhite~>White</td>
+            </tr>   
+            <tr>
+                <td><INPUT type="radio" name="fgc" value="yellow"~fgyellow~>Yellow</td>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td><INPUT type="radio" name="bgc" value="yellow"~bgyellow~>Yellow</td>
+            </tr>
+            <tr>
+                <td><INPUT type="radio" name="fgc" value="cyan"~fgcyan~>Cyan</td>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td><INPUT type="radio" name="bgc" value="cyan"~bgcyan~>Cyan</td>
+            </tr>
+            <tr>
+                <td><INPUT type="radio" name="fgc" value="violet"~fgviolet~>Violet</td>
+                <td>&nbsp;&nbsp;&nbsp;</td>
+                <td><INPUT type="radio" name="bgc" value="violet"~bgviolet~>Violet</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        
+        
+          
+        
+        
+        
+        
+        
+        
+    </div>
+    <div>
+        <INPUT type="submit" value="Send">
+        <INPUT type="reset">
+    </div>
+    </P>
+</FORM>
+</div> <!--content-->
+
+~inc:footer.inc~
