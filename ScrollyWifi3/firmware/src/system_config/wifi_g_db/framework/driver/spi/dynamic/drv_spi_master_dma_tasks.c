@@ -73,9 +73,6 @@ void DRV_SPI_MasterDMASendDummy8BitISR(SYS_DMA_TRANSFER_EVENT event, SYS_DMA_CHA
     {
         // Job is done
         currentJob->txDMAProgressStage = DRV_SPI_DMA_COMPLETE;
-        pDrvInstance->rxEnabled = true;
-        SYS_INT_SourceEnable(pDrvInstance->rxInterruptSource);
-        SYS_INT_SourceEnable(pDrvInstance->txInterruptSource);
     }
 
 }
@@ -102,7 +99,8 @@ void DRV_SPI_MasterDMASendData8BitISR(SYS_DMA_TRANSFER_EVENT event, SYS_DMA_CHAN
     }
     else
     {
-        DRV_SPI_MasterDMASendDummy8BitISR(event,  handle,  contextHandle);
+        // Job is done
+        currentJob->txDMAProgressStage = DRV_SPI_DMA_COMPLETE;
     }
 }
 
@@ -146,8 +144,7 @@ void DRV_SPI_MasterDMAReceiveDummy8BitISR(SYS_DMA_TRANSFER_EVENT event, SYS_DMA_
     {
         // Job is done
         currentJob->rxDMAProgressStage = DRV_SPI_DMA_COMPLETE;
-        pDrvInstance->txEnabled = true;
-        SYS_INT_SourceEnable(pDrvInstance->txInterruptSource);
+        SYS_INT_SourceEnable(pDrvInstance->rxInterruptSource);
     }
 }
 
@@ -172,7 +169,9 @@ void DRV_SPI_MasterDMAReceiveData8BitISR(SYS_DMA_TRANSFER_EVENT event, SYS_DMA_C
     }
     else
     {
-        DRV_SPI_MasterDMAReceiveDummy8BitISR(event,  handle,  contextHandle);
+        // Job is done
+        currentJob->rxDMAProgressStage = DRV_SPI_DMA_COMPLETE;
+        SYS_INT_SourceEnable(pDrvInstance->rxInterruptSource);
     }
 }
 
@@ -217,9 +216,6 @@ void DRV_SPI_MasterDMASendDummyPolled(SYS_DMA_TRANSFER_EVENT event, SYS_DMA_CHAN
     {
         // Job is done
         currentJob->txDMAProgressStage = DRV_SPI_DMA_COMPLETE;
-        pDrvInstance->rxEnabled = true;
-        SYS_INT_SourceEnable(pDrvInstance->rxInterruptSource);
-        SYS_INT_SourceEnable(pDrvInstance->txInterruptSource);
     }
 
 }
@@ -246,7 +242,8 @@ void DRV_SPI_MasterDMASendDataPolled(SYS_DMA_TRANSFER_EVENT event, SYS_DMA_CHANN
     }
     else
     {
-        DRV_SPI_MasterDMASendDummyPolled(event,  handle,  contextHandle);
+        // Job is done
+        currentJob->txDMAProgressStage = DRV_SPI_DMA_COMPLETE;
     }
 }
 
@@ -290,8 +287,7 @@ void DRV_SPI_MasterDMAReceiveDummyPolled(SYS_DMA_TRANSFER_EVENT event, SYS_DMA_C
     {
         // Job is done
         currentJob->rxDMAProgressStage = DRV_SPI_DMA_COMPLETE;
-        pDrvInstance->txEnabled = true;
-        SYS_INT_SourceEnable(pDrvInstance->txInterruptSource);
+        SYS_INT_SourceEnable(pDrvInstance->rxInterruptSource);
     }
 }
 
@@ -316,7 +312,9 @@ void DRV_SPI_MasterDMAReceiveDataPolled(SYS_DMA_TRANSFER_EVENT event, SYS_DMA_CH
     }
     else
     {
-        DRV_SPI_MasterDMAReceiveDummyPolled(event,  handle,  contextHandle);
+        // Job is done
+        currentJob->rxDMAProgressStage = DRV_SPI_DMA_COMPLETE;
+        SYS_INT_SourceEnable(pDrvInstance->rxInterruptSource);
     }
 }
 
@@ -332,294 +330,6 @@ void DRV_SPI_PolledDMAMasterReceiveEventHandler8bit(SYS_DMA_TRANSFER_EVENT event
             break;
         case DRV_SPI_DMA_DUMMY_INPROGRESS:
             DRV_SPI_MasterDMAReceiveDummyPolled(event, handle, contextHandle);
-            break;
-        default:
-            break;
-    }
-}
-
-
-void DRV_SPI_MasterDMASendDummy32BitISR(SYS_DMA_TRANSFER_EVENT event, SYS_DMA_CHANNEL_HANDLE handle, uintptr_t contextHandle)
-{
-    if (event != SYS_DMA_TRANSFER_EVENT_COMPLETE)
-    {
-        // Ignore for now
-        return;
-    }
-    struct DRV_SPI_DRIVER_OBJECT * pDrvInstance = (struct DRV_SPI_DRIVER_OBJECT *)contextHandle;
-    DRV_SPI_JOB_OBJECT * currentJob = pDrvInstance->currentJob;
-    if (currentJob->dummyLeftToTx != 0)
-    {
-            uint8_t * ptr = sDrvSpiTxDummy;
-            uint32_t len = MIN(MIN(MIN(PLIB_DMA_MAX_TRF_SIZE, currentJob->dummyLeftToTx), DRV_SPI_DMA_TXFER_SIZE), DRV_SPI_DMA_DUMMY_BUFFER_SIZE);
-            void * spiPtr = PLIB_SPI_BufferAddressGet(pDrvInstance->spiId);
-            SYS_DMA_ChannelTransferAdd(pDrvInstance->txDmaChannelHandle, ptr, len, spiPtr, 4, 4);
-            currentJob->txDMAProgressStage = DRV_SPI_DMA_DUMMY_INPROGRESS;
-            currentJob->dummyLeftToTx -= len;
-    }
-    else
-    {
-        // Job is done
-        currentJob->txDMAProgressStage = DRV_SPI_DMA_COMPLETE;
-        pDrvInstance->rxEnabled = true;
-        SYS_INT_SourceEnable(pDrvInstance->rxInterruptSource);
-        SYS_INT_SourceEnable(pDrvInstance->txInterruptSource);
-    }
-
-}
-
-
-void DRV_SPI_MasterDMASendData32BitISR(SYS_DMA_TRANSFER_EVENT event, SYS_DMA_CHANNEL_HANDLE handle, uintptr_t contextHandle)
-{
-    if (event != SYS_DMA_TRANSFER_EVENT_COMPLETE)
-    {
-        // Ignore for now
-        return;
-    }
-    struct DRV_SPI_DRIVER_OBJECT * pDrvInstance = (struct DRV_SPI_DRIVER_OBJECT *)contextHandle;
-    DRV_SPI_JOB_OBJECT * currentJob = pDrvInstance->currentJob;
-    if (currentJob->dataLeftToTx != 0)
-    {
-            uint8_t * ptr = &(currentJob->txBuffer[currentJob->dataTxed]);
-            uint32_t len = MIN(MIN(PLIB_DMA_MAX_TRF_SIZE, currentJob->dataLeftToTx), DRV_SPI_DMA_TXFER_SIZE);
-            void * spiPtr = PLIB_SPI_BufferAddressGet(pDrvInstance->spiId);
-            SYS_DMA_ChannelTransferAdd(pDrvInstance->txDmaChannelHandle, ptr, len, spiPtr, 4, 4);
-            currentJob->txDMAProgressStage = DRV_SPI_DMA_DATA_INPROGRESS;
-            currentJob->dataLeftToTx -= len;
-            currentJob->dataTxed += len;
-    }
-    else
-    {
-        DRV_SPI_MasterDMASendDummy32BitISR(event,  handle,  contextHandle);
-    }
-}
-
-
-void DRV_SPI_ISRDMAMasterSendEventHandler32bit(SYS_DMA_TRANSFER_EVENT event, SYS_DMA_CHANNEL_HANDLE handle, uintptr_t contextHandle)
-{
-    struct DRV_SPI_DRIVER_OBJECT * pDrvInstance = (struct DRV_SPI_DRIVER_OBJECT * )contextHandle;
-    register DRV_SPI_JOB_OBJECT * currentJob = pDrvInstance->currentJob;
-
-    switch(currentJob->txDMAProgressStage)
-    {
-        case DRV_SPI_DMA_DATA_INPROGRESS:
-            DRV_SPI_MasterDMASendData32BitISR(event, handle, contextHandle);
-            break;
-        case DRV_SPI_DMA_DUMMY_INPROGRESS:
-            DRV_SPI_MasterDMASendDummy32BitISR(event, handle, contextHandle);
-            break;
-        default:
-            break;
-    }
-}
-void DRV_SPI_MasterDMAReceiveDummy32BitISR(SYS_DMA_TRANSFER_EVENT event, SYS_DMA_CHANNEL_HANDLE handle, uintptr_t contextHandle)
-{
-    if (event != SYS_DMA_TRANSFER_EVENT_COMPLETE)
-    {
-        // Ignore for now
-        return;
-    }
-    struct DRV_SPI_DRIVER_OBJECT * pDrvInstance = (struct DRV_SPI_DRIVER_OBJECT *)contextHandle;
-    DRV_SPI_JOB_OBJECT * currentJob = pDrvInstance->currentJob;
-    if (currentJob->dummyLeftToRx != 0)
-    {
-            uint8_t * ptr = sDrvSpiRxDummy;
-            uint32_t len = MIN(MIN(MIN(PLIB_DMA_MAX_TRF_SIZE, currentJob->dummyLeftToRx), DRV_SPI_DMA_TXFER_SIZE), DRV_SPI_DMA_DUMMY_BUFFER_SIZE);
-            void * spiPtr = PLIB_SPI_BufferAddressGet(pDrvInstance->spiId);
-            SYS_DMA_ChannelTransferAdd(pDrvInstance->rxDmaChannelHandle, spiPtr, 4, ptr, len, 4);
-            currentJob->rxDMAProgressStage = DRV_SPI_DMA_DUMMY_INPROGRESS;
-            currentJob->dummyLeftToRx -= len;
-    }
-    else
-    {
-        // Job is done
-        currentJob->rxDMAProgressStage = DRV_SPI_DMA_COMPLETE;
-        pDrvInstance->txEnabled = true;
-        SYS_INT_SourceEnable(pDrvInstance->txInterruptSource);
-    }
-}
-
-void DRV_SPI_MasterDMAReceiveData32BitISR(SYS_DMA_TRANSFER_EVENT event, SYS_DMA_CHANNEL_HANDLE handle, uintptr_t contextHandle)
-{
-    if (event != SYS_DMA_TRANSFER_EVENT_COMPLETE)
-    {
-        // Ignore for now
-        return;
-    }
-    struct DRV_SPI_DRIVER_OBJECT * pDrvInstance = (struct DRV_SPI_DRIVER_OBJECT *)contextHandle;
-    DRV_SPI_JOB_OBJECT * currentJob = pDrvInstance->currentJob;
-    if (currentJob->dataLeftToRx != 0)
-    {
-            uint8_t * ptr = &(currentJob->rxBuffer[currentJob->dataRxed]);
-            uint32_t len = MIN(MIN(PLIB_DMA_MAX_TRF_SIZE, currentJob->dataLeftToRx), DRV_SPI_DMA_TXFER_SIZE);
-            void * spiPtr = PLIB_SPI_BufferAddressGet(pDrvInstance->spiId);
-            SYS_DMA_ChannelTransferAdd(pDrvInstance->rxDmaChannelHandle, spiPtr, 4, ptr, len, 4);
-            currentJob->rxDMAProgressStage = DRV_SPI_DMA_DATA_INPROGRESS;
-            currentJob->dataLeftToRx -= len;
-            currentJob->dataRxed += len;
-    }
-    else
-    {
-        DRV_SPI_MasterDMAReceiveDummy32BitISR(event,  handle,  contextHandle);
-    }
-}
-
-void DRV_SPI_ISRDMAMasterReceiveEventHandler32bit(SYS_DMA_TRANSFER_EVENT event, SYS_DMA_CHANNEL_HANDLE handle, uintptr_t contextHandle)
-{
-    struct DRV_SPI_DRIVER_OBJECT * pDrvInstance = (struct DRV_SPI_DRIVER_OBJECT * )contextHandle;
-    register DRV_SPI_JOB_OBJECT * currentJob = pDrvInstance->currentJob;
-
-    switch(currentJob->rxDMAProgressStage)
-    {
-        case DRV_SPI_DMA_DATA_INPROGRESS:
-            DRV_SPI_MasterDMAReceiveData32BitISR(event, handle, contextHandle);
-            break;
-        case DRV_SPI_DMA_DUMMY_INPROGRESS:
-            DRV_SPI_MasterDMAReceiveDummy32BitISR(event, handle, contextHandle);
-            break;
-        default:
-            break;
-    }
-}
-
-
-void DRV_SPI_MasterDMASendDummy32BitPolled(SYS_DMA_TRANSFER_EVENT event, SYS_DMA_CHANNEL_HANDLE handle, uintptr_t contextHandle)
-{
-    if (event != SYS_DMA_TRANSFER_EVENT_COMPLETE)
-    {
-        // Ignore for now
-        return;
-    }
-    struct DRV_SPI_DRIVER_OBJECT * pDrvInstance = (struct DRV_SPI_DRIVER_OBJECT *)contextHandle;
-    DRV_SPI_JOB_OBJECT * currentJob = pDrvInstance->currentJob;
-    if (currentJob->dummyLeftToTx != 0)
-    {
-            uint8_t * ptr = sDrvSpiTxDummy;
-            uint32_t len = MIN(MIN(MIN(PLIB_DMA_MAX_TRF_SIZE, currentJob->dummyLeftToTx), DRV_SPI_DMA_TXFER_SIZE), DRV_SPI_DMA_DUMMY_BUFFER_SIZE);
-            void * spiPtr = PLIB_SPI_BufferAddressGet(pDrvInstance->spiId);
-            SYS_DMA_ChannelTransferAdd(pDrvInstance->txDmaChannelHandle, ptr, len, spiPtr, 4, 4);
-            currentJob->txDMAProgressStage = DRV_SPI_DMA_DUMMY_INPROGRESS;
-            currentJob->dummyLeftToTx -= len;
-    }
-    else
-    {
-        // Job is done
-        currentJob->txDMAProgressStage = DRV_SPI_DMA_COMPLETE;
-        pDrvInstance->rxEnabled = true;
-        SYS_INT_SourceEnable(pDrvInstance->rxInterruptSource);
-        SYS_INT_SourceEnable(pDrvInstance->txInterruptSource);
-    }
-
-}
-
-
-void DRV_SPI_MasterDMASendData32BitPolled(SYS_DMA_TRANSFER_EVENT event, SYS_DMA_CHANNEL_HANDLE handle, uintptr_t contextHandle)
-{
-    if (event != SYS_DMA_TRANSFER_EVENT_COMPLETE)
-    {
-        // Ignore for now
-        return;
-    }
-    struct DRV_SPI_DRIVER_OBJECT * pDrvInstance = (struct DRV_SPI_DRIVER_OBJECT *)contextHandle;
-    DRV_SPI_JOB_OBJECT * currentJob = pDrvInstance->currentJob;
-    if (currentJob->dataLeftToTx != 0)
-    {
-            uint8_t * ptr = &(currentJob->txBuffer[currentJob->dataTxed]);
-            uint32_t len = MIN(MIN(PLIB_DMA_MAX_TRF_SIZE, currentJob->dataLeftToTx), DRV_SPI_DMA_TXFER_SIZE);
-            void * spiPtr = PLIB_SPI_BufferAddressGet(pDrvInstance->spiId);
-            SYS_DMA_ChannelTransferAdd(pDrvInstance->txDmaChannelHandle, ptr, len, spiPtr, 4, 4);
-            currentJob->txDMAProgressStage = DRV_SPI_DMA_DATA_INPROGRESS;
-            currentJob->dataLeftToTx -= len;
-            currentJob->dataTxed += len;
-    }
-    else
-    {
-        DRV_SPI_MasterDMASendDummy32BitPolled(event,  handle,  contextHandle);
-    }
-}
-
-
-void DRV_SPI_PolledDMAMasterSendEventHandler32bit(SYS_DMA_TRANSFER_EVENT event, SYS_DMA_CHANNEL_HANDLE handle, uintptr_t contextHandle)
-{
-    struct DRV_SPI_DRIVER_OBJECT * pDrvInstance = (struct DRV_SPI_DRIVER_OBJECT * )contextHandle;
-    register DRV_SPI_JOB_OBJECT * currentJob = pDrvInstance->currentJob;
-
-    switch(currentJob->txDMAProgressStage)
-    {
-        case DRV_SPI_DMA_DATA_INPROGRESS:
-            DRV_SPI_MasterDMASendData32BitPolled(event, handle, contextHandle);
-            break;
-        case DRV_SPI_DMA_DUMMY_INPROGRESS:
-            DRV_SPI_MasterDMASendDummy32BitPolled(event, handle, contextHandle);
-            break;
-        default:
-            break;
-    }
-}
-void DRV_SPI_MasterDMAReceiveDummy32BitPolled(SYS_DMA_TRANSFER_EVENT event, SYS_DMA_CHANNEL_HANDLE handle, uintptr_t contextHandle)
-{
-    if (event != SYS_DMA_TRANSFER_EVENT_COMPLETE)
-    {
-        // Ignore for now
-        return;
-    }
-    struct DRV_SPI_DRIVER_OBJECT * pDrvInstance = (struct DRV_SPI_DRIVER_OBJECT *)contextHandle;
-    DRV_SPI_JOB_OBJECT * currentJob = pDrvInstance->currentJob;
-    if (currentJob->dummyLeftToRx != 0)
-    {
-            uint8_t * ptr = sDrvSpiRxDummy;
-            uint32_t len = MIN(MIN(MIN(PLIB_DMA_MAX_TRF_SIZE, currentJob->dummyLeftToRx), DRV_SPI_DMA_TXFER_SIZE), DRV_SPI_DMA_DUMMY_BUFFER_SIZE);
-            void * spiPtr = PLIB_SPI_BufferAddressGet(pDrvInstance->spiId);
-            SYS_DMA_ChannelTransferAdd(pDrvInstance->rxDmaChannelHandle, spiPtr, 4, ptr, len, 4);
-            currentJob->rxDMAProgressStage = DRV_SPI_DMA_DUMMY_INPROGRESS;
-            currentJob->dummyLeftToRx -= len;
-    }
-    else
-    {
-        // Job is done
-        currentJob->rxDMAProgressStage = DRV_SPI_DMA_COMPLETE;
-        pDrvInstance->txEnabled = true;
-        SYS_INT_SourceEnable(pDrvInstance->txInterruptSource);
-    }
-}
-
-void DRV_SPI_MasterDMAReceiveData32BitPolled(SYS_DMA_TRANSFER_EVENT event, SYS_DMA_CHANNEL_HANDLE handle, uintptr_t contextHandle)
-{
-    if (event != SYS_DMA_TRANSFER_EVENT_COMPLETE)
-    {
-        // Ignore for now
-        return;
-    }
-    struct DRV_SPI_DRIVER_OBJECT * pDrvInstance = (struct DRV_SPI_DRIVER_OBJECT *)contextHandle;
-    DRV_SPI_JOB_OBJECT * currentJob = pDrvInstance->currentJob;
-    if (currentJob->dataLeftToRx != 0)
-    {
-            uint8_t * ptr = &(currentJob->rxBuffer[currentJob->dataRxed]);
-            uint32_t len = MIN(MIN(PLIB_DMA_MAX_TRF_SIZE, currentJob->dataLeftToRx), DRV_SPI_DMA_TXFER_SIZE);
-            void * spiPtr = PLIB_SPI_BufferAddressGet(pDrvInstance->spiId);
-            SYS_DMA_ChannelTransferAdd(pDrvInstance->rxDmaChannelHandle, spiPtr, 4, ptr, len, 4);
-            currentJob->rxDMAProgressStage = DRV_SPI_DMA_DATA_INPROGRESS;
-            currentJob->dataLeftToRx -= len;
-            currentJob->dataRxed += len;
-    }
-    else
-    {
-        DRV_SPI_MasterDMAReceiveDummy32BitPolled(event,  handle,  contextHandle);
-    }
-}
-
-void DRV_SPI_PolledDMAMasterReceiveEventHandler32bit(SYS_DMA_TRANSFER_EVENT event, SYS_DMA_CHANNEL_HANDLE handle, uintptr_t contextHandle)
-{
-    struct DRV_SPI_DRIVER_OBJECT * pDrvInstance = (struct DRV_SPI_DRIVER_OBJECT * )contextHandle;
-    register DRV_SPI_JOB_OBJECT * currentJob = pDrvInstance->currentJob;
-
-    switch(currentJob->rxDMAProgressStage)
-    {
-        case DRV_SPI_DMA_DATA_INPROGRESS:
-            DRV_SPI_MasterDMAReceiveData32BitPolled(event, handle, contextHandle);
-            break;
-        case DRV_SPI_DMA_DUMMY_INPROGRESS:
-            DRV_SPI_MasterDMAReceiveDummy32BitPolled(event, handle, contextHandle);
             break;
         default:
             break;

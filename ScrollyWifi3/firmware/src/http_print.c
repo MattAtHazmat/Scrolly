@@ -74,7 +74,6 @@ void TCPIP_HTTP_Print_bgyellow(HTTP_CONN_HANDLE connHandle);
 void TCPIP_HTTP_Print_bgcyan(HTTP_CONN_HANDLE connHandle);
 void TCPIP_HTTP_Print_bgviolet(HTTP_CONN_HANDLE connHandle);
 void TCPIP_HTTP_Print_bgred(HTTP_CONN_HANDLE connHandle);
-void TCPIP_HTTP_Print_builddate(HTTP_CONN_HANDLE connHandle);
 
 void TCPIP_HTTP_Print(HTTP_CONN_HANDLE connHandle,uint32_t callbackID)
 {
@@ -186,15 +185,11 @@ TCP_SOCKET sktHTTP;
         case 0x00000026:
 			TCPIP_HTTP_Print_bgred(connHandle);
 			break;
-        case 0x00000028:
-			TCPIP_HTTP_Print_builddate(connHandle);
-			break;
 		default:
 			// Output notification for undefined values
                        sktHTTP = TCPIP_HTTP_CurrentConnectionSocketGet(connHandle);
 			TCPIP_TCP_ArrayPut(sktHTTP, (const uint8_t*)"!DEF", 4);
 	}
-
 	return;
 }
 

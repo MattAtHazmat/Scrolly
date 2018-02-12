@@ -41,7 +41,12 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // Section: Included Files
 // *****************************************************************************
 // *****************************************************************************
-#include "app.h"
+
+#include <stddef.h>                     // Defines NULL
+#include <stdbool.h>                    // Defines true
+#include <stdlib.h>                     // Defines EXIT_FAILURE
+#include "system/common/sys_module.h"   // SYS function prototypes
+
 
 // *****************************************************************************
 // *****************************************************************************
@@ -49,24 +54,15 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 
-MAIN_RETURN main ( void )
+int main ( void )
 {
-    /*Call the SYS Init routine. App init routine gets called from this*/
-    SYS_Initialize(NULL);
-
-    while(true)
+    SYS_Initialize ( NULL );
+    while ( true )
     {
-        /*Invoke SYS tasks. APP tasks gets called from this*/
-        SYS_Tasks();
-
+        SYS_Tasks ( );
     }
-
-    // Should not come here during normal operation
-    SYS_ASSERT(false, "about to exit main");
-
-    return MAIN_RETURN_CODE(MAIN_RETURN_SUCCESS);
+    return ( EXIT_FAILURE );
 }
-
 /*******************************************************************************
  End of File
 */

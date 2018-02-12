@@ -58,6 +58,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_config.h"
 #include "system_definitions.h"
 #include "peripheral/osc/plib_osc.h"
+#include "system/devcon/sys_devcon.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -93,7 +94,7 @@ void SYS_CLK_Initialize( const SYS_CLK_INIT const * clkInit )
     PLIB_OSC_FRCDivisorSelect( OSC_ID_0, OSC_FRC_DIV_2);
 
     /* Enable Peripheral Bus 1 */
-    PLIB_OSC_PBClockDivisorSet (OSC_ID_0, 0, 2 );
+    PLIB_OSC_PBClockDivisorSet (OSC_ID_0, 0, 1 );
 
 
 
@@ -213,4 +214,80 @@ inline uint32_t SYS_CLK_PeripheralFrequencyGet ( CLK_BUSES_PERIPHERAL peripheral
 inline uint32_t SYS_CLK_ReferenceClockFrequencyGet ( CLK_BUSES_REFERENCE referenceBus )
 {
 	return 0;
+}
+
+/******************************************************************************
+  Function:
+    void SYS_CLK_SecondaryOscillatorEnable ( void )
+
+  Summary:
+    Enables the secondary oscillator.
+
+  Description:
+    This function enables the secondary oscillator.
+
+  Remarks:
+    For more details refer sys_clk.h.
+*/
+
+void SYS_CLK_SecondaryOscillatorEnable ( void )
+{
+    /* Check for secondary oscillator status */
+    if (!PLIB_OSC_SecondaryIsEnabled(OSC_ID_0))
+    {    
+        /* Unlock and enable secondary oscillator */
+        SYS_DEVCON_SystemUnlock();
+        
+        PLIB_OSC_SecondaryEnable(OSC_ID_0);
+        
+        SYS_DEVCON_SystemLock();
+    }
+}
+
+/******************************************************************************
+  Function:
+    void SYS_CLK_SecondaryOscillatorDisable ( void )
+
+  Summary:
+    Disables the secondary oscillator.
+
+  Description:
+    This function disables the secondary oscillator.
+
+  Remarks:
+    For more details refer sys_clk.h.
+*/
+
+void SYS_CLK_SecondaryOscillatorDisable ( void )
+{
+    /* Check for secondary oscillator status */
+    if (PLIB_OSC_SecondaryIsEnabled(OSC_ID_0))
+    {    
+        /* Unlock and disable secondary oscillator*/
+        SYS_DEVCON_SystemUnlock();
+        
+        PLIB_OSC_SecondaryDisable(OSC_ID_0);
+        
+        SYS_DEVCON_SystemLock();
+    }
+}
+
+/******************************************************************************
+  Function:
+    bool SYS_CLK_SecondaryOscillatorIsEnabled ( void )
+
+  Summary:
+    Identifies whether secondary oscillator is enabled or disabled.
+
+  Description:
+    This function identifies whether the secondary oscillator is enabled or 
+    disabled.
+    
+  Remarks:
+    For more details refer sys_clk.h.
+*/
+
+bool SYS_CLK_SecondaryOscillatorIsEnabled ( void )
+{
+    return (PLIB_OSC_SecondaryIsEnabled(OSC_ID_0));
 }

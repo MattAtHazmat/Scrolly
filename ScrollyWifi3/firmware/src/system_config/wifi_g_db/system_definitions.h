@@ -50,8 +50,6 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
-#include <string.h>
-#include <time.h>
 #include "FirmwareConfiguration.h"
 #include "HardwareConfiguration.h"
 #include "system/common/sys_common.h"
@@ -73,12 +71,12 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "driver/spi/drv_spi.h"
 
 
+
 #include "driver/rtcc/drv_rtcc_static.h"
 #include "peripheral/devcon/plib_devcon.h"
 #include "tcpip/tcpip.h"
 #include "driver/ethmac/drv_ethmac.h"
 #include "driver/wifi/mrf24w/drv_wifi.h"
-#include "app.h"
 #include "color.h"
 #include "LEDDisplay.h"
 #include "scroller.h"

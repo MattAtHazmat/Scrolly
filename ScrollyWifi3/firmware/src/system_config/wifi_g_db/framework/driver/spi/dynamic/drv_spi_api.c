@@ -137,11 +137,6 @@ int32_t DRV_SPI_SetVTable(struct DRV_SPI_DRIVER_OBJECT * driverObject, const DRV
         mode |= _SPI_DRV_VTABLE_8BIT;
     }
     else
-    if (pInit->commWidth == SPI_COMMUNICATION_WIDTH_32BITS)
-    {
-        mode |= _SPI_DRV_VTABLE_32BIT;
-    }
-    else
     {
         SYS_ASSERT(false, "\r\nInvalid SPI Configuration.");
         return -1;
@@ -153,40 +148,20 @@ int32_t DRV_SPI_SetVTable(struct DRV_SPI_DRIVER_OBJECT * driverObject, const DRV
         driverObject->sendDMAHander = DRV_SPI_PolledDMAMasterSendEventHandler8bit;
         driverObject->receiveDMAHander = DRV_SPI_PolledDMAMasterReceiveEventHandler8bit;
         break;
-    case _SPI_DRV_VTABLE_P_M_R_32:
-        driverObject->vfMainTask = DRV_SPI_PolledMasterRM32BitTasks;
-        driverObject->sendDMAHander = DRV_SPI_PolledDMAMasterSendEventHandler32bit;
-        driverObject->receiveDMAHander = DRV_SPI_PolledDMAMasterReceiveEventHandler32bit;
-        break;
     case _SPI_DRV_VTABLE_P_M_E_8:
         driverObject->vfMainTask = DRV_SPI_PolledMasterEBM8BitTasks;
         driverObject->sendDMAHander = DRV_SPI_PolledDMAMasterSendEventHandler8bit;
         driverObject->receiveDMAHander = DRV_SPI_PolledDMAMasterReceiveEventHandler8bit;
-        break;
-    case _SPI_DRV_VTABLE_P_M_E_32:
-        driverObject->vfMainTask = DRV_SPI_PolledMasterEBM32BitTasks;
-        driverObject->sendDMAHander = DRV_SPI_PolledDMAMasterSendEventHandler32bit;
-        driverObject->receiveDMAHander = DRV_SPI_PolledDMAMasterReceiveEventHandler32bit;
         break;
     case _SPI_DRV_VTABLE_I_M_R_8:
         driverObject->vfMainTask = DRV_SPI_ISRMasterRM8BitTasks;
         driverObject->sendDMAHander = DRV_SPI_ISRDMAMasterSendEventHandler8bit;
         driverObject->receiveDMAHander = DRV_SPI_ISRDMAMasterReceiveEventHandler8bit;
         break;
-    case _SPI_DRV_VTABLE_I_M_R_32:
-        driverObject->vfMainTask = DRV_SPI_ISRMasterRM32BitTasks;
-        driverObject->sendDMAHander = DRV_SPI_ISRDMAMasterSendEventHandler32bit;
-        driverObject->receiveDMAHander = DRV_SPI_ISRDMAMasterReceiveEventHandler32bit;
-        break;
     case _SPI_DRV_VTABLE_I_M_E_8:
         driverObject->vfMainTask = DRV_SPI_ISRMasterEBM8BitTasks;
         driverObject->sendDMAHander = DRV_SPI_ISRDMAMasterSendEventHandler8bit;
         driverObject->receiveDMAHander = DRV_SPI_ISRDMAMasterReceiveEventHandler8bit;
-        break;
-    case _SPI_DRV_VTABLE_I_M_E_32:
-        driverObject->vfMainTask = DRV_SPI_ISRMasterEBM32BitTasks;
-        driverObject->sendDMAHander = DRV_SPI_ISRDMAMasterSendEventHandler32bit;
-        driverObject->receiveDMAHander = DRV_SPI_ISRDMAMasterReceiveEventHandler32bit;
         break;
     default:
         SYS_ASSERT(false, "\r\nInvalid SPI Configuration.");

@@ -40,7 +40,6 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
  *******************************************************************************/
 // DOM-IGNORE-END
 
-
 // *****************************************************************************
 // *****************************************************************************
 // Section: Included Files
@@ -77,7 +76,6 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #pragma config FCKSM =      CSECME
 #pragma config WDTPS =      PS1048576
 #pragma config FWDTEN =     OFF
-
 /*** DEVCFG2 ***/
 
 #pragma config FPLLIDIV =   DIV_2
@@ -85,7 +83,6 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #pragma config FPLLODIV =   DIV_1
 #pragma config UPLLIDIV =   DIV_2
 #pragma config UPLLEN =     ON
-
 /*** DEVCFG3 ***/
 
 #pragma config USERID =     0xffff
@@ -96,51 +93,14 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #pragma config FVBUSONIO =  OFF
 // </editor-fold>
 
-
-// *****************************************************************************
-// *****************************************************************************
-// Section: Library/Stack Initialization Data
-// *****************************************************************************
-// *****************************************************************************
-
-
-
 // *****************************************************************************
 // *****************************************************************************
 // Section: Driver Initialization Data
 // *****************************************************************************
 // *****************************************************************************
-
-//<editor-fold defaultstate="collapsed" desc="DRV_Timer Initialization Data">
-
-/*** TMR Driver Initialization Data ***/
-
-const DRV_TMR_INIT drvTmr0InitData =
-{
-    .moduleInit.sys.powerState = DRV_TMR_POWER_STATE_IDX0,
-    .tmrId = DRV_TMR_PERIPHERAL_ID_IDX0,
-    .clockSource = DRV_TMR_CLOCK_SOURCE_IDX0, 
-    .prescale = DRV_TMR_PRESCALE_IDX0,
-    .mode = DRV_TMR_OPERATION_MODE_IDX0,
-    .interruptSource = DRV_TMR_INTERRUPT_SOURCE_IDX0,
-    .asyncWriteEnable = false,
-};
-const DRV_TMR_INIT drvTmr1InitData =
-{
-    .moduleInit.sys.powerState = DRV_TMR_POWER_STATE_IDX1,
-    .tmrId = DRV_TMR_PERIPHERAL_ID_IDX1,
-    .clockSource = DRV_TMR_CLOCK_SOURCE_IDX1, 
-    .prescale = DRV_TMR_PRESCALE_IDX1,
-    .mode = DRV_TMR_OPERATION_MODE_IDX1,
-    .interruptSource = DRV_TMR_INTERRUPT_SOURCE_IDX1,
-    .asyncWriteEnable = false,
-};
-// </editor-fold>
-// <editor-fold defaultstate="collapsed" desc="DRV_NVM Initialization Data">
-extern const uint8_t NVM_MEDIA_DATA[];
-
+//<editor-fold defaultstate="collapsed" desc="DRV_NVM Initialization Data">
 /*** FLASH Driver Initialization Data ***/
-
+extern const uint8_t NVM_MEDIA_DATA[];
 SYS_FS_MEDIA_REGION_GEOMETRY NVMGeometryTable[3] = 
 {
     {
@@ -172,17 +132,16 @@ const DRV_NVM_INIT drvNvmInit =
     .nvmID = NVM_ID_0,
     .interruptSource = INT_SOURCE_FLASH_CONTROL,
 
-    .mediaStartAddress = (uintptr_t )NVM_MEDIA_DATA,
+    .mediaStartAddress = 0x9D000000,
     .nvmMediaGeometry = (SYS_FS_MEDIA_GEOMETRY *)&NVMGeometry
 
 };
 
 
 // </editor-fold>
-// <editor-fold defaultstate="collapsed" desc="DRV_SPI Initialization Data"> 
- 
+//<editor-fold defaultstate="collapsed" desc="DRV_SPI Initialization Data">
  /*** SPI Driver Initialization Data ***/
-  /*** Index 0  ***/
+ /*** Index 0  ***/
  DRV_SPI_INIT drvSpi0InitData =
  {
     .spiId = DRV_SPI_SPI_ID_IDX0,
@@ -199,7 +158,7 @@ const DRV_NVM_INIT drvNvmInit =
     .queueSize = DRV_SPI_QUEUE_SIZE_IDX0,
     .jobQueueReserveSize = DRV_SPI_RESERVED_JOB_IDX0,
  };
-  /*** Index 1  ***/
+ /*** Index 1  ***/
  DRV_SPI_INIT drvSpi1InitData =
  {
     .spiId = DRV_SPI_SPI_ID_IDX1,
@@ -224,7 +183,85 @@ const DRV_NVM_INIT drvNvmInit =
     .jobQueueReserveSize = DRV_SPI_RESERVED_JOB_IDX1,
  };
 // </editor-fold>
-// <editor-fold defaultstate="collapsed" desc="SYS_TMR Initialization Data">
+// <editor-fold defaultstate="collapsed" desc="DRV_Timer Initialization Data">
+/*** TMR Driver Initialization Data ***/
+
+const DRV_TMR_INIT drvTmr0InitData =
+{
+    .moduleInit.sys.powerState = DRV_TMR_POWER_STATE_IDX0,
+    .tmrId = DRV_TMR_PERIPHERAL_ID_IDX0,
+    .clockSource = DRV_TMR_CLOCK_SOURCE_IDX0, 
+    .prescale = DRV_TMR_PRESCALE_IDX0,
+    .mode = DRV_TMR_OPERATION_MODE_16_BIT,
+    .interruptSource = DRV_TMR_INTERRUPT_SOURCE_IDX0,
+    .asyncWriteEnable = false,
+};
+const DRV_TMR_INIT drvTmr1InitData =
+{
+    .moduleInit.sys.powerState = DRV_TMR_POWER_STATE_IDX1,
+    .tmrId = DRV_TMR_PERIPHERAL_ID_IDX1,
+    .clockSource = DRV_TMR_CLOCK_SOURCE_IDX1, 
+    .prescale = DRV_TMR_PRESCALE_IDX1,
+    .mode = DRV_TMR_OPERATION_MODE_IDX1,
+    .interruptSource = DRV_TMR_INTERRUPT_SOURCE_IDX1,
+    .asyncWriteEnable = false,
+};
+// </editor-fold>
+
+// *****************************************************************************
+// *****************************************************************************
+// Section: System Data
+// *****************************************************************************
+// *****************************************************************************
+
+/* Structure to hold the object handles for the modules in the system. */
+SYSTEM_OBJECTS sysObj;
+
+// *****************************************************************************
+// *****************************************************************************
+// Section: Module Initialization Data
+// *****************************************************************************
+// *****************************************************************************
+//<editor-fold defaultstate="collapsed" desc="SYS_DEVCON Initialization Data">
+/*******************************************************************************
+  Device Control System Service Initialization Data
+*/
+
+const SYS_DEVCON_INIT sysDevconInit =
+{
+    .moduleInit = {0},
+};
+
+// </editor-fold>
+//<editor-fold defaultstate="collapsed" desc="SYS_DMA Initialization Data">
+/*** System DMA Initialization Data ***/
+
+const SYS_DMA_INIT sysDmaInit =
+{
+	.sidl = SYS_DMA_SIDL_DISABLE,
+
+};
+// </editor-fold>
+// <editor-fold defaultstate="collapsed" desc="SYS_FS Initialization Data">
+/*** File System Initialization Data ***/
+
+const SYS_FS_MEDIA_MOUNT_DATA sysfsMountTable[SYS_FS_VOLUME_NUMBER] = 
+{
+	{NULL}
+};
+
+
+
+const SYS_FS_REGISTRATION_TABLE sysFSInit [ SYS_FS_MAX_FILE_SYSTEM_TYPE ] =
+{
+    {
+        .nativeFileSystemType = MPFS2,
+        .nativeFileSystemFunctions = &MPFSFunctions
+    }
+};
+
+// </editor-fold>
+//<editor-fold defaultstate="collapsed" desc="SYS_TMR Initialization Data">
 /*** TMR Service Initialization Data ***/
 const SYS_TMR_INIT sysTmrInitData =
 {
@@ -232,16 +269,19 @@ const SYS_TMR_INIT sysTmrInitData =
     .drvIndex = DRV_TMR_INDEX_0,
     .tmrFreq = 1250, 
 };
-
 // </editor-fold>
 
+// *****************************************************************************
+// *****************************************************************************
+// Section: Library/Stack Initialization Data
+// *****************************************************************************
+// *****************************************************************************
+// <editor-fold defaultstate="collapsed" desc="TCPIP Stack Initialization Data">
 // *****************************************************************************
 // *****************************************************************************
 // Section: TCPIP Data
 // *****************************************************************************
 // *****************************************************************************
-
-//<editor-fold defaultstate="collapsed" desc="TCPIP Stack Initialization Data">
 
 /*** ARP Service Initialization Data ***/
 const TCPIP_ARP_MODULE_CONFIG tcpipARPInitData =
@@ -265,8 +305,6 @@ const TCPIP_UDP_MODULE_CONFIG tcpipUDPInitData =
 {
     .nSockets       = TCPIP_UDP_MAX_SOCKETS,
     .sktTxBuffSize  = TCPIP_UDP_SOCKET_DEFAULT_TX_SIZE, 
-    .poolBuffers    = TCPIP_UDP_SOCKET_POOL_BUFFERS,
-    .poolBufferSize = TCPIP_UDP_SOCKET_POOL_BUFFER_SIZE,
 };
 
 /*** TCP Sockets Initialization Data ***/
@@ -289,6 +327,7 @@ const TCPIP_HTTP_MODULE_CONFIG tcpipHTTPInitData =
     .tlsSktRxBuffSize	= TCPIP_HTTP_TLS_SKT_RX_BUFF_SIZE,
     .configFlags	= TCPIP_HTTP_CONFIG_FLAGS,
 };
+
 
 /*** SNTP Client Initialization Data ***/
 const TCPIP_SNTP_MODULE_CONFIG tcpipSNTPInitData =
@@ -332,14 +371,25 @@ const TCPIP_DNS_CLIENT_MODULE_CONFIG tcpipDNSClientInitData =
     .deleteOldLease         = TCPIP_DNS_CLIENT_DELETE_OLD_ENTRIES,
     .cacheEntries           = TCPIP_DNS_CLIENT_CACHE_ENTRIES,
     .entrySolvedTmo         = TCPIP_DNS_CLIENT_CACHE_ENTRY_TMO,    
-    .IPv4EntriesPerDNSName  = TCPIP_DNS_CLIENT_CACHE_PER_IPV4_ADDRESS,
-    .dnsIpAddressType       = TCPIP_DNS_CLIENT_OPEN_ADDRESS_TYPE,
-    .IPv6EntriesPerDNSName  = TCPIP_DNS_CLIENT_CACHE_PER_IPV6_ADDRESS,
+    .nIPv4Entries  = TCPIP_DNS_CLIENT_CACHE_PER_IPV4_ADDRESS,
+    .ipAddressType       = TCPIP_DNS_CLIENT_ADDRESS_TYPE,
+    .nIPv6Entries  = TCPIP_DNS_CLIENT_CACHE_PER_IPV6_ADDRESS,
 };
 
 
 
 
+TCPIP_STACK_HEAP_INTERNAL_CONFIG tcpipHeapConfig =
+{
+    .heapType = TCPIP_STACK_HEAP_TYPE_INTERNAL_HEAP,
+    .heapFlags = TCPIP_STACK_HEAP_USE_FLAGS,
+    .heapUsage = TCPIP_STACK_HEAP_USAGE_CONFIG,
+    .malloc_fnc = TCPIP_STACK_MALLOC_FUNC,
+    .calloc_fnc = TCPIP_STACK_CALLOC_FUNC,
+    .free_fnc = TCPIP_STACK_FREE_FUNC,
+    .heapSize = TCPIP_STACK_DRAM_SIZE,
+};
+ 
 const TCPIP_NETWORK_CONFIG __attribute__((unused))  TCPIP_HOSTS_CONFIGURATION[] =
 {
 /*** Network Configuration Index 0 ***/
@@ -361,7 +411,6 @@ const TCPIP_NETWORK_CONFIG __attribute__((unused))  TCPIP_HOSTS_CONFIGURATION[] 
 const TCPIP_STACK_MODULE_CONFIG TCPIP_STACK_MODULE_CONFIG_TBL [] =
 {
     {TCPIP_MODULE_IPV4,          0},
-    {TCPIP_MODULE_ICMP,          0},                           // TCPIP_MODULE_ICMP
     {TCPIP_MODULE_ARP,           &tcpipARPInitData},              // TCPIP_MODULE_ARP
     {TCPIP_MODULE_UDP,           &tcpipUDPInitData},              // TCPIP_MODULE_UDP,
     {TCPIP_MODULE_TCP,           &tcpipTCPInitData},              // TCPIP_MODULE_TCP,
@@ -370,8 +419,10 @@ const TCPIP_STACK_MODULE_CONFIG TCPIP_STACK_MODULE_CONFIG_TBL [] =
     {TCPIP_MODULE_SNTP,    &tcpipSNTPInitData},                            // TCPIP_MODULE_SNTP,
 
     {TCPIP_MODULE_HTTP_SERVER,   &tcpipHTTPInitData},              // TCPIP_MODULE_HTTP_SERVER,
+    { TCPIP_MODULE_MANAGER,    & tcpipHeapConfig },          // TCPIP_MODULE_MANAGER
     // MAC modules
     {TCPIP_MODULE_MAC_MRF24W, &macMRF24WConfigData},        // TCPIP_MODULE_MAC_MRF24W
+
 };
 
 /*********************************************************************
@@ -408,75 +459,8 @@ SYS_MODULE_OBJ TCPIP_STACK_Init()
 
     return TCPIP_STACK_Initialize(0, &tcpipInit.moduleInit);
 }
-
 // </editor-fold>
 
-// *****************************************************************************
-// *****************************************************************************
-// Section: System Data
-// *****************************************************************************
-// *****************************************************************************
-
-/* Structure to hold the object handles for the modules in the system. */
-SYSTEM_OBJECTS sysObj;
-
-
-// *****************************************************************************
-// *****************************************************************************
-// Section: Module Initialization Data
-// *****************************************************************************
-// *****************************************************************************
-
-/*******************************************************************************
-  Device Control System Service Initialization Data
-  
-  <editor-fold defaultstate="collapsed" 
-  desc="Device Control System Service Initialization Data">
-*/
-
-const SYS_DEVCON_INIT sysDevconInit =
-{
-    .moduleInit = {0},
-};
-
-// </editor-fold>
-
-
-//<editor-fold defaultstate="collapsed" desc="SYS_DMA Initialization Data">
-
-/*** System DMA Initialization Data ***/
-
-const SYS_DMA_INIT sysDmaInit =
-{
-	.sidl = SYS_DMA_SIDL_DISABLE,
-
-};
-
-// </editor-fold>
-//<editor-fold defaultstate="collapsed" desc="SYS_FS Initialization Data">
-
-
-
-/*** File System Initialization Data ***/
-
-const SYS_FS_MEDIA_MOUNT_DATA sysfsMountTable[SYS_FS_VOLUME_NUMBER] = 
-{
-	{NULL}
-};
-
-
-
-const SYS_FS_REGISTRATION_TABLE sysFSInit [ SYS_FS_MAX_FILE_SYSTEM_TYPE ] =
-{
-    {
-        .nativeFileSystemType = MPFS2,
-        .nativeFileSystemFunctions = &MPFSFunctions
-    }
-};
-
-
-
-// </editor-fold>
 // *****************************************************************************
 // *****************************************************************************
 // Section: Static Initialization Functions
@@ -492,7 +476,7 @@ const SYS_FS_REGISTRATION_TABLE sysFSInit [ SYS_FS_MAX_FILE_SYSTEM_TYPE ] =
 
 /*******************************************************************************
   Function:
-    void SYS_Initialize ( SYS_INIT_DATA *data )
+    void SYS_Initialize ( void *data )
 
   Summary:
     Initializes the board, services, drivers, application and other modules.
@@ -509,37 +493,30 @@ void SYS_Initialize ( void* data )
     SYS_DEVCON_PerformanceConfig(SYS_CLK_SystemFrequencyGet());
     SYS_DEVCON_JTAGDisable();
     SYS_PORTS_Initialize();
-    sysObj.sysDma = SYS_DMA_Initialize((SYS_MODULE_INIT *)&sysDmaInit);
-
-
-
-
     /* Board Support Package Initialization */
-    BSP_Initialize();        
+    BSP_Initialize();
 
     /* Initialize Drivers */
 
-    sysObj.drvTmr0 = DRV_TMR_Initialize(DRV_TMR_INDEX_0, (SYS_MODULE_INIT *)&drvTmr0InitData);
-    sysObj.drvTmr1 = DRV_TMR_Initialize(DRV_TMR_INDEX_1, (SYS_MODULE_INIT *)&drvTmr1InitData);
-
-    SYS_INT_VectorPrioritySet(INT_VECTOR_T1, INT_PRIORITY_LEVEL4);
-    SYS_INT_VectorSubprioritySet(INT_VECTOR_T1, INT_SUBPRIORITY_LEVEL3);
-    SYS_INT_VectorPrioritySet(INT_VECTOR_T3, INT_PRIORITY_LEVEL1);
-    SYS_INT_VectorSubprioritySet(INT_VECTOR_T3, INT_SUBPRIORITY_LEVEL0);
- 
- 
- 
     /*** SPI Driver Index 0 initialization***/
 
- 
     sysObj.spiObjectIdx0 = DRV_SPI_Initialize(DRV_SPI_INDEX_0, (const SYS_MODULE_INIT  * const)&drvSpi0InitData);
 
     /*** SPI Driver Index 1 initialization***/
 
     SYS_INT_VectorPrioritySet(DRV_SPI_INT_VECTOR_IDX1, DRV_SPI_INT_PRIORITY_IDX1);
     SYS_INT_VectorSubprioritySet(DRV_SPI_INT_VECTOR_IDX1, DRV_SPI_INT_SUB_PRIORITY_IDX1);
- 
     sysObj.spiObjectIdx1 = DRV_SPI_Initialize(DRV_SPI_INDEX_1, (const SYS_MODULE_INIT  * const)&drvSpi1InitData);
+    sysObj.sysDma = SYS_DMA_Initialize((SYS_MODULE_INIT *)&sysDmaInit);
+    SYS_INT_VectorPrioritySet(INT_VECTOR_DMA0, INT_PRIORITY_LEVEL6);
+    SYS_INT_VectorSubprioritySet(INT_VECTOR_DMA0, INT_SUBPRIORITY_LEVEL1);
+    SYS_INT_VectorPrioritySet(INT_VECTOR_DMA1, INT_PRIORITY_LEVEL7);
+    SYS_INT_VectorSubprioritySet(INT_VECTOR_DMA1, INT_SUBPRIORITY_LEVEL0);
+ 
+    SYS_INT_SourceEnable(INT_SOURCE_DMA_0);
+    SYS_INT_SourceEnable(INT_SOURCE_DMA_1);
+
+
     /* Configure the Flash Controller Interrupt Priority */
     SYS_INT_VectorPrioritySet(INT_VECTOR_FCE, INT_PRIORITY_LEVEL4);
 
@@ -552,37 +529,55 @@ void SYS_Initialize ( void* data )
     DRV_RTCC_Initialize();
 
 
-    /* Enable MRF24W Interrupt */
-    SYS_PORTS_PinDirectionSelect(PORTS_ID_0,
-                                 SYS_PORTS_DIRECTION_INPUT,
-                                 WF_INT_PORT_CHANNEL,
-                                 WF_INT_BIT_POS);
+    sysObj.drvTmr0 = DRV_TMR_Initialize(DRV_TMR_INDEX_0, (SYS_MODULE_INIT *)&drvTmr0InitData);
+    sysObj.drvTmr1 = DRV_TMR_Initialize(DRV_TMR_INDEX_1, (SYS_MODULE_INIT *)&drvTmr1InitData);
+    
+    SYS_INT_VectorPrioritySet(INT_VECTOR_T1, INT_PRIORITY_LEVEL4);
+    SYS_INT_VectorSubprioritySet(INT_VECTOR_T1, INT_SUBPRIORITY_LEVEL3);
+    SYS_INT_VectorPrioritySet(INT_VECTOR_T3, INT_PRIORITY_LEVEL1);
+    SYS_INT_VectorSubprioritySet(INT_VECTOR_T3, INT_SUBPRIORITY_LEVEL0);
 
- 
- 
+
+
+
     /* Initialize System Services */
+
+    /*** File System Service Initialization Code ***/
+    SYS_FS_Initialize( (const void *) sysFSInit );
+
+    /*** Interrupt Service Initialization Code ***/
     SYS_INT_Initialize();  
+
+    /*Setup the INT_SOURCE_EXTERNAL_1 and Enable it*/
+    SYS_INT_VectorPrioritySet(INT_VECTOR_INT1, INT_PRIORITY_LEVEL4);
+    SYS_INT_VectorSubprioritySet(INT_VECTOR_INT1, INT_SUBPRIORITY_LEVEL0);
+    SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE1,INT_EDGE_TRIGGER_RISING);
+    SYS_INT_SourceEnable(INT_SOURCE_EXTERNAL_1);
+
+
+
+
+
+
+    /*** Random Service Initialization Code ***/
+    SYS_RANDOM_Initialize(0, 0);
 
     /*** TMR Service Initialization Code ***/
     sysObj.sysTmr  = SYS_TMR_Initialize(SYS_TMR_INDEX_0, (const SYS_MODULE_INIT  * const)&sysTmrInitData);
-    SYS_FS_Initialize( (const void *) sysFSInit );
-    SYS_RANDOM_Initialize(0, 0);
 
     /* Initialize Middleware */
 
     
     /* TCPIP Stack Initialization */
     sysObj.tcpip = TCPIP_STACK_Init();
-    if (sysObj.tcpip == SYS_MODULE_OBJ_INVALID)
-    {
-       return;
-    }
+    SYS_ASSERT(sysObj.tcpip != SYS_MODULE_OBJ_INVALID, "TCPIP_STACK_Init Failed" );
+
 
     /* Enable Global Interrupts */
     SYS_INT_Enable();
 
     /* Initialize the Application */
-    APP_Initialize();
+    NET_Initialize();
     SCROLLER_Initialize();
     TIMEYWIMEY_Initialize();
 }

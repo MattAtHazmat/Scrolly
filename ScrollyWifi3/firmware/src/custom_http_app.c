@@ -49,6 +49,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "tcpip_helpers_local.h"
 #include "tcpip/src/tcpip_private.h"
 
+#include "LEDDisplay.h"
 /****************************************************************************
   Section:
     Definitions
@@ -99,6 +100,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
     #if defined(HTTP_APP_USE_WIFI)
         static HTTP_IO_RESULT HTTPPostWIFIConfig(HTTP_CONN_HANDLE connHandle);
     #endif
+    static HTTP_IO_RESULT HTTPPostScroller(HTTP_CONN_HANDLE connHandle);
 #endif
 
 /****************************************************************************
@@ -114,6 +116,9 @@ extern WF_DEVICE_INFO g_wifi_deviceInfo;
 extern WF_REDIRECTION_CONFIG g_redirectionConfig;
 static bool s_scanResultIsValid = false;
 static WF_SCAN_RESULT *s_scanResult;
+static IWPRIV_GET_PARAM s_httpapp_get_param;
+static IWPRIV_SET_PARAM s_httpapp_set_param;
+static IWPRIV_EXECUTE_PARAM s_httpapp_execute_param;
 static uint8_t s_buf_ipv4addr[HTTP_APP_IPV4_ADDRESS_BUFFER_SIZE];
 
 extern const char * const ddnsServiceHosts[];
@@ -136,7 +141,7 @@ static bool lastFailure = false;
   Section:
     Helper Functions
  ****************************************************************************/
-static HTTP_IO_RESULT HTTPPostScroller(HTTP_CONN_HANDLE connHandle);
+
 /*******************************************************************************
  * FUNCTION: Helper_HEXCharToBIN
  *
@@ -239,7 +244,7 @@ static bool Helper_HEXStrToBINInplace(char *p_str, uint8_t expected_binary_size)
 static bool Helper_WIFI_SecurityHandle(WF_REDIRECTION_CONFIG *cfg, const char *str)
 {
     uint8_t ascii_key = 0, key_size = 0;
-    switch (cfg->security) {
+    switch (cfg->securityMode) {
         case WF_SECURITY_OPEN: // Keep compiler happy, nothing to do here!
             ascii_key = true;
             break;
@@ -249,7 +254,7 @@ static bool Helper_WIFI_SecurityHandle(WF_REDIRECTION_CONFIG *cfg, const char *s
                 ascii_key = true;
                 key_size = 5; /* ASCII key support. */
             }
-            cfg->defaultWepKey = 0; /* Example uses only key idx 0 (sometimes called 1). */
+            cfg->wepKeyIndex = 0; /* Example uses only key idx 0 (sometimes called 1). */
             break;
         case WF_SECURITY_WEP_104:
             key_size = 26; /* Assume hex size. */
@@ -257,7 +262,7 @@ static bool Helper_WIFI_SecurityHandle(WF_REDIRECTION_CONFIG *cfg, const char *s
                 ascii_key = true;
                 key_size = 13; /* ASCII key support. */
             }
-            cfg->defaultWepKey = 0; /* Example uses only key idx 0 (sometimes called 1). */
+            cfg->wepKeyIndex = 0; /* Example uses only key idx 0 (sometimes called 1). */
             break;
         case WF_SECURITY_WPA_WITH_PASS_PHRASE:
         case WF_SECURITY_WPA2_WITH_PASS_PHRASE:
@@ -270,26 +275,26 @@ static bool Helper_WIFI_SecurityHandle(WF_REDIRECTION_CONFIG *cfg, const char *s
             break;
     }
     if (strlen(str) != key_size) {
-        SYS_CONSOLE_MESSAGE("\r\nIncomplete key received.\r\n");
+        SYS_CONSOLE_MESSAGE("\r\nIncomplete key received\r\n");
         return false;
     }
-    memcpy(cfg->key, (void *)str, key_size);
-    cfg->key[key_size] = 0; /* terminate string */
+    memcpy(cfg->securityKey, (void *)str, key_size);
+    cfg->securityKey[key_size] = 0; /* terminate string */
     if (!ascii_key) {
         key_size /= 2;
-        if (!Helper_HEXStrToBINInplace((char *)cfg->key, key_size)) {
+        if (!Helper_HEXStrToBINInplace((char *)cfg->securityKey, key_size)) {
             SYS_CONSOLE_MESSAGE("\r\nFailed to convert ASCII string (representing HEX digits) to real HEX string!\r\n");
             return false;
         }
     }
-    cfg->SecurityKeyLength = key_size;
+    cfg->securityKeyLen = key_size;
     return true;
 }
 
 static void Helper_WIFI_KeySave(WF_REDIRECTION_CONFIG *redirectCfg, WF_CONFIG_DATA *cfg)
 {
     uint8_t key_size =0;
-    switch ((uint8_t)redirectCfg->security) {
+    switch ((uint8_t)redirectCfg->securityMode) {
         case WF_SECURITY_WEP_40:
             key_size = 5;
             break;
@@ -299,17 +304,26 @@ static void Helper_WIFI_KeySave(WF_REDIRECTION_CONFIG *redirectCfg, WF_CONFIG_DA
         case WF_SECURITY_WPA_WITH_PASS_PHRASE:
         case WF_SECURITY_WPA2_WITH_PASS_PHRASE:
         case WF_SECURITY_WPA_AUTO_WITH_PASS_PHRASE:
-            key_size = strlen((const char *)(redirectCfg->key)); // ascii so use strlen
+            key_size = strlen((const char *)(redirectCfg->securityKey)); // ascii so use strlen
             break;
     }
-    memcpy(cfg->SecurityKey, redirectCfg->key, key_size);
-    cfg->SecurityKey[strlen((const char *)(redirectCfg->key))] = 0;
-    cfg->SecurityKeyLength = key_size;
+    memcpy(cfg->securityKey, redirectCfg->securityKey, key_size);
+    cfg->securityKey[strlen((const char *)(redirectCfg->securityKey))] = 0;
+    cfg->securityKeyLen = key_size;
 }
 
-static void Helper_RedirectionFlagSet(uintptr_t context, uint32_t currTick)
+static void Helper_APP_RedirectionFlagSet(uintptr_t context, uint32_t currTick)
 {
     g_redirect_signal = true;
+}
+
+static HTTP_IO_RESULT Helper_APP_ConfigFailure(HTTP_CONN_HANDLE connHandle, uint8_t *httpDataBuff)
+{
+    lastFailure = true;
+    if (httpDataBuff)
+        strcpy((char *)httpDataBuff, "/error.htm");
+    TCPIP_HTTP_CurrentConnectionStatusSet(connHandle, HTTP_REDIRECT);
+    return HTTP_IO_DONE;
 }
 
 /****************************************************************************
@@ -454,7 +468,8 @@ HTTP_IO_RESULT TCPIP_HTTP_GetExecute(HTTP_CONN_HANDLE connHandle)
         ptr = TCPIP_HTTP_ArgGet(httpDataBuff, (const uint8_t *)"scan");
         ptr1 = TCPIP_HTTP_ArgGet(httpDataBuff, (const uint8_t *)"getBss");
 
-        iwpriv_config_read(&g_wifi_cfg);
+        s_httpapp_get_param.config.data = &g_wifi_cfg;
+        iwpriv_get(CONFIG_GET, &s_httpapp_get_param);
 
         if ((ptr != NULL) && (ptr1 == NULL))
         {
@@ -465,8 +480,15 @@ HTTP_IO_RESULT TCPIP_HTTP_GetExecute(HTTP_CONN_HANDLE connHandle)
              * Display pre-scan results if pre-scan results are available,
              * otherwise initiate a new scan.
              */
-            if (iwpriv_numberofscanresults_get() == 0) {
-                iwpriv_scan_start();
+            iwpriv_get(SCANRESULTS_COUNT_GET, &s_httpapp_get_param);
+            if (s_httpapp_get_param.scan.numberOfResults == 0) {
+                iwpriv_execute(SCAN_START, &s_httpapp_execute_param);
+                do {
+                    iwpriv_get(SCANSTATUS_GET, &s_httpapp_get_param);
+                } while (s_httpapp_get_param.scan.scanStatus == IWPRIV_SCAN_IN_PROGRESS);
+                do {
+                    iwpriv_execute(SCANRESULTS_SAVE, &s_httpapp_execute_param);
+                } while (s_httpapp_execute_param.scan.saveStatus == IWPRIV_IN_PROGRESS);
             }
         }
         else if ((ptr == NULL) && (ptr1 != NULL))
@@ -478,12 +500,15 @@ HTTP_IO_RESULT TCPIP_HTTP_GetExecute(HTTP_CONN_HANDLE connHandle)
             bssIdxStr.v[0] = *(ptr1 + 1);
             bssIdx = hexatob(bssIdxStr.Val);
 
-            s_scanResult = (WF_SCAN_RESULT *)iwpriv_scanresult_get(bssIdx);
+            s_httpapp_get_param.scan.index = (uint16_t)bssIdx;
+            iwpriv_get(SCANRESULT_GET, &s_httpapp_get_param);
+            s_scanResult = (WF_SCAN_RESULT *)s_httpapp_get_param.scan.data;
 
+            if (s_scanResult) {
             if (s_scanResult->ssidLen < 32)
                 s_scanResult->ssid[s_scanResult->ssidLen] = 0;
-
             s_scanResultIsValid = true;
+        }
         }
         else
         {
@@ -698,7 +723,7 @@ static HTTP_IO_RESULT HTTPPostWIFIConfig(HTTP_CONN_HANDLE connHandle)
     byteCount = TCPIP_HTTP_CurrentConnectionByteCountGet(connHandle);
     sktHTTP = TCPIP_HTTP_CurrentConnectionSocketGet(connHandle);
     if(byteCount > TCPIP_TCP_GetIsReady(sktHTTP) + TCPIP_TCP_FifoRxFreeGet(sktHTTP))
-        goto ConfigFailure;
+        return Helper_APP_ConfigFailure(connHandle, httpDataBuff);
 
     // Ensure that all data is waiting to be parsed.  If not, keep waiting for
     // all of it to arrive.
@@ -711,115 +736,124 @@ static HTTP_IO_RESULT HTTPPostWIFIConfig(HTTP_CONN_HANDLE connHandle)
     {
         // Read a form field name.
         if(TCPIP_HTTP_PostNameRead(connHandle, httpDataBuff, 6) != HTTP_READ_OK)
-            goto ConfigFailure;
+            return Helper_APP_ConfigFailure(connHandle, httpDataBuff);
 
         // Read a form field value.
         if(TCPIP_HTTP_PostValueRead(connHandle, httpDataBuff + 6, TCPIP_HTTP_MAX_DATA_LEN - 6 - 2) != HTTP_READ_OK)
-            goto ConfigFailure;
+            return Helper_APP_ConfigFailure(connHandle, httpDataBuff);
 
         // Parse the value that was read.
         if(!strcmp((char *)httpDataBuff, (const char *)"wlan"))
-        { // Get the wlan mode: Ad-Hoc or Infrastructure.
-            char mode[6];
+        {
+            // Get the network type: Ad-Hoc or Infrastructure.
+            char networkType[6];
             if (strlen((char *)(httpDataBuff + 6)) > 5) /* Sanity check. */
-                goto ConfigFailure;
+                return Helper_APP_ConfigFailure(connHandle, httpDataBuff);
 
-            memcpy(mode, (void *)(httpDataBuff + 6), strlen((char *)(httpDataBuff + 6)));
-            mode[strlen((char *)(httpDataBuff + 6))] = 0; /* Terminate string. */
-            if(!strcmp((char *)mode, (const char *)"infra"))
+            memcpy(networkType, (void *)(httpDataBuff + 6), strlen((char *)(httpDataBuff + 6)));
+            networkType[strlen((char *)(httpDataBuff + 6))] = 0; /* Terminate string. */
+            if (!strcmp((char *)networkType, (const char *)"infra"))
             {
-                g_redirectionConfig.type = WF_NETWORK_TYPE_INFRASTRUCTURE;
+                g_redirectionConfig.networkType = WF_NETWORK_TYPE_INFRASTRUCTURE;
             }
-            else if(!strcmp((char *)mode, "adhoc"))
+            else if (!strcmp((char *)networkType, "adhoc"))
             {
                 WF_ADHOC_NETWORK_CONTEXT adhocContext;
-                g_redirectionConfig.type = WF_NETWORK_TYPE_ADHOC;
+                g_redirectionConfig.networkType = WF_NETWORK_TYPE_ADHOC;
 
                 // Always setup Ad-Hoc to attempt to connect first, then start.
                 adhocContext.mode = WF_DEFAULT_ADHOC_MODE;
                 adhocContext.beaconPeriod = WF_DEFAULT_ADHOC_BEACON_PERIOD;
                 adhocContext.hiddenSsid = WF_DEFAULT_ADHOC_HIDDEN_SSID;
-                iwpriv_adhocctx_set(&adhocContext);
+                s_httpapp_set_param.ctx.data = &adhocContext;
+                iwpriv_set(ADHOCCTX_SET, &s_httpapp_set_param);
             }
             else
             {
-                // Mode type no good. :-(
-                SYS_CONSOLE_MESSAGE((const char *)"\r\nUnknown mode type on www! ");
-                goto ConfigFailure;
+                // Network type no good. :-(
+                SYS_CONSOLE_MESSAGE((const char *)"\r\nInvalid redirection network type\r\n");
+                return Helper_APP_ConfigFailure(connHandle, httpDataBuff);
             }
 
-            // Save old WLAN mode.
-            iwpriv_nettype_get(&g_redirectionConfig.prevWLAN);
+            // Save old network type.
+            iwpriv_get(NETWORKTYPE_GET, &s_httpapp_get_param);
+            g_redirectionConfig.prevNetworkType = s_httpapp_get_param.netType.type;
         }
         else if(!strcmp((char *)httpDataBuff, "ssid"))
-        { // Get new ssid and make sure it is valid.
+        {
+            // Get new ssid and make sure it is valid.
             if(strlen((char *)(httpDataBuff + 6)) < 33u)
             {
                 memcpy(g_redirectionConfig.ssid, (void *)(httpDataBuff + 6), strlen((char *)(httpDataBuff + 6)));
                 g_redirectionConfig.ssid[strlen((char *)(httpDataBuff + 6))] = 0; /* Terminate string. */
 
                 /* Save current profile SSID for displaying later. */
-                iwpriv_ssid_get((uint8_t *)&g_redirectionConfig.prevSSID, &ssidLen);
+                s_httpapp_get_param.ssid.ssid = g_redirectionConfig.prevSSID;
+                iwpriv_get(SSID_GET, &s_httpapp_get_param);
+                ssidLen = s_httpapp_get_param.ssid.ssidLen;
                 g_redirectionConfig.prevSSID[ssidLen] = 0;
             }
             else
             {
-                goto ConfigFailure; // Invalid SSID... :-(
+                // Invalid SSID... :-(
+                return Helper_APP_ConfigFailure(connHandle, httpDataBuff);
             }
         }
         else if(!strcmp((char *)httpDataBuff, (const char *)"sec"))
         {
-            char security_type[7]; // Read security type.
+            char securityMode[7]; // Read security mode.
 
             if (strlen((char *)(httpDataBuff + 6)) > 6) /* Sanity check. */
-                goto ConfigFailure;
+                return Helper_APP_ConfigFailure(connHandle, httpDataBuff);
 
-            memcpy(security_type, (void *)(httpDataBuff + 6), strlen((char *)(httpDataBuff + 6)));
-            security_type[strlen((char *)(httpDataBuff + 6))] = 0; /* Terminate string. */
+            memcpy(securityMode, (void *)(httpDataBuff + 6), strlen((char *)(httpDataBuff + 6)));
+            securityMode[strlen((char *)(httpDataBuff + 6))] = 0; /* Terminate string. */
 
-            if (!strcmp((char *)security_type, (const char *)"no"))
+            if (!strcmp((char *)securityMode, (const char *)"no"))
             {
-                g_redirectionConfig.security = WF_SECURITY_OPEN;
+                g_redirectionConfig.securityMode = WF_SECURITY_OPEN;
             }
-            else if(!strcmp((char *)security_type, (const char *)"wep40"))
+            else if (!strcmp((char *)securityMode, (const char *)"wep40"))
             {
-                g_redirectionConfig.security = WF_SECURITY_WEP_40;
+                g_redirectionConfig.securityMode = WF_SECURITY_WEP_40;
             }
-            else if(!strcmp((char *)security_type, (const char *)"wep104"))
+            else if (!strcmp((char *)securityMode, (const char *)"wep104"))
             {
-                g_redirectionConfig.security = WF_SECURITY_WEP_104;
+                g_redirectionConfig.securityMode = WF_SECURITY_WEP_104;
             }
-            else if(!strcmp((char *)security_type, (const char *)"wpa1"))
+            else if (!strcmp((char *)securityMode, (const char *)"wpa1"))
             {
-                g_redirectionConfig.security = WF_SECURITY_WPA_AUTO_WITH_PASS_PHRASE;
+                g_redirectionConfig.securityMode = WF_SECURITY_WPA_AUTO_WITH_PASS_PHRASE;
             }
-            else if(!strcmp((char *)security_type, (const char *)"wpa2"))
+            else if (!strcmp((char *)securityMode, (const char *)"wpa2"))
             {
-                g_redirectionConfig.security = WF_SECURITY_WPA_AUTO_WITH_PASS_PHRASE;
+                g_redirectionConfig.securityMode = WF_SECURITY_WPA_AUTO_WITH_PASS_PHRASE;
             }
-            else if(!strcmp((char *)security_type, (const char *)"wpa"))
+            else if (!strcmp((char *)securityMode, (const char *)"wpa"))
             {
-                g_redirectionConfig.security = WF_SECURITY_WPA_AUTO_WITH_PASS_PHRASE;
+                g_redirectionConfig.securityMode = WF_SECURITY_WPA_AUTO_WITH_PASS_PHRASE;
             }
             else
-            { // Security type no good. :-(
-                SYS_CONSOLE_MESSAGE("\r\nUnknown key type on www\r\n");
-                goto ConfigFailure;
+            {
+                // Security mode no good. :-(
+                SYS_CONSOLE_MESSAGE("\r\nInvalid redirection security mode\r\n\r\n");
+                return Helper_APP_ConfigFailure(connHandle, httpDataBuff);
             }
         }
         else if(!strcmp((char *)httpDataBuff, (const char *)"key"))
-        { // Read new key material.
+        {
+            // Read new key material.
             if (!Helper_WIFI_SecurityHandle(&g_redirectionConfig, (const char *)(httpDataBuff + 6)))
-                goto ConfigFailure;
+                return Helper_APP_ConfigFailure(connHandle, httpDataBuff);
         }
     }
 
     /* Check if WPA hasn't been selected with Ad-Hoc, if it has we choke! */
-    if ((g_redirectionConfig.type == WF_NETWORK_TYPE_ADHOC) && (
-        (g_redirectionConfig.security == WF_SECURITY_WPA_WITH_PASS_PHRASE) ||
-        (g_redirectionConfig.security == WF_SECURITY_WPA2_WITH_PASS_PHRASE) ||
-        (g_redirectionConfig.security == WF_SECURITY_WPA_AUTO_WITH_PASS_PHRASE)))
-        goto ConfigFailure;
+    if ((g_redirectionConfig.networkType == WF_NETWORK_TYPE_ADHOC) && (
+        (g_redirectionConfig.securityMode == WF_SECURITY_WPA_WITH_PASS_PHRASE) ||
+        (g_redirectionConfig.securityMode == WF_SECURITY_WPA2_WITH_PASS_PHRASE) ||
+        (g_redirectionConfig.securityMode == WF_SECURITY_WPA_AUTO_WITH_PASS_PHRASE)))
+        return Helper_APP_ConfigFailure(connHandle, httpDataBuff);
 
     /*
      * All parsing complete!  If we have got to here all data has been validated and
@@ -827,38 +861,29 @@ static HTTP_IO_RESULT HTTPPostWIFIConfig(HTTP_CONN_HANDLE connHandle)
      */
 
     /* Copy Wi-Fi cfg data to be committed to NVM. */
-    iwpriv_config_read(&g_wifi_cfg);
-    strcpy((char *)g_wifi_cfg.netSSID, (char *)g_redirectionConfig.ssid);
-    g_wifi_cfg.SsidLength = strlen((char *)(g_redirectionConfig.ssid));
+    s_httpapp_get_param.config.data = &g_wifi_cfg;
+    iwpriv_get(CONFIG_GET, &s_httpapp_get_param);
+    strcpy((char *)g_wifi_cfg.ssid, (char *)g_redirectionConfig.ssid);
+    g_wifi_cfg.ssidLen = strlen((char *)(g_redirectionConfig.ssid));
     /* Going to set security type. */
-    g_wifi_cfg.SecurityMode = g_redirectionConfig.security;
+    g_wifi_cfg.securityMode = g_redirectionConfig.securityMode;
     /* Going to save the key, if required. */
-    if (g_redirectionConfig.security != WF_SECURITY_OPEN)
+    if (g_redirectionConfig.securityMode != WF_SECURITY_OPEN)
         Helper_WIFI_KeySave(&g_redirectionConfig, &g_wifi_cfg);
-
     /* Going to save the network type. */
-    g_wifi_cfg.networkType = g_redirectionConfig.type;
-    g_wifi_cfg.dataValid = 1; /* Validate Wi-Fi configuration. */
-    iwpriv_config_write(&g_wifi_cfg);
+    g_wifi_cfg.networkType = g_redirectionConfig.networkType;
+    s_httpapp_set_param.config.data = &g_wifi_cfg;
+    iwpriv_set(CONFIG_SET, &s_httpapp_set_param);
 
     strcpy((char *)httpDataBuff, "/reconnect.htm");
     TCPIP_HTTP_CurrentConnectionStatusSet(connHandle, HTTP_REDIRECT);
 
     /* Set 1s delay before redirection, goal is to display the redirection web page. */
     uint16_t redirection_delay = SYS_TMR_TickCounterFrequencyGet() * HTTP_APP_REDIRECTION_DELAY_TIME;
-    SYS_TMR_CallbackSingle(redirection_delay, 0, Helper_RedirectionFlagSet);
+    SYS_TMR_CallbackSingle(redirection_delay, 0, Helper_APP_RedirectionFlagSet);
 
     return HTTP_IO_DONE;
-
-    ConfigFailure:
-        lastFailure = true;
-        if(httpDataBuff)
-        {
-            strcpy((char *)httpDataBuff, "/error.htm");
         }
-        TCPIP_HTTP_CurrentConnectionStatusSet(connHandle, HTTP_REDIRECT);
-        return HTTP_IO_DONE;
-}
 #endif // defined(HTTP_APP_USE_WIFI)
 
 /*******************************************************************************
@@ -1184,7 +1209,7 @@ static HTTP_IO_RESULT HTTPPostSNMPCommunity(HTTP_CONN_HANDLE connHandle)
 static HTTP_IO_RESULT HTTPPostMD5(HTTP_CONN_HANDLE connHandle)
 {
     uint32_t lenA, lenB;
-    CRYPT_MD5_CTX md5;
+    static CRYPT_MD5_CTX md5;
 
     TCP_SOCKET sktHTTP;
     uint8_t *httpDataBuff;
@@ -1392,7 +1417,7 @@ static HTTP_IO_RESULT HTTPPostEmail(HTTP_CONN_HANDLE connHandle)
             }
             else if(!strcmp((char *)cName, (const char *)"msg"))
             {   // Done with headers, move on to the message
-                // Delete paramters that are just null strings (no data from user) or illegal (ex: password without username)
+                // Delete parameters that are just null strings (no data from user) or illegal (ex: password without username)
                 if(mySMTPClient.Server )
                     if(*mySMTPClient.Server == 0x00u)
                         mySMTPClient.Server = NULL;
@@ -2338,7 +2363,8 @@ void TCPIP_HTTP_Print_scan(HTTP_CONN_HANDLE connHandle)
     uint8_t scanInProgressString[4];
     TCP_SOCKET sktHTTP = TCPIP_HTTP_CurrentConnectionSocketGet(connHandle);
 
-    if (iwpriv_scanstatus_get() == IWPRIV_SCAN_IN_PROGRESS)
+    iwpriv_get(SCANSTATUS_GET, &s_httpapp_get_param);
+    if (s_httpapp_get_param.scan.scanStatus == IWPRIV_SCAN_IN_PROGRESS)
         uitoa((uint16_t)true, scanInProgressString);
     else
         uitoa((uint16_t)false, scanInProgressString);
@@ -2355,7 +2381,8 @@ void TCPIP_HTTP_Print_fwver(HTTP_CONN_HANDLE connHandle)
     if (firstTime)
     {
         firstTime = false;
-        iwpriv_devinfo_get(&deviceInfo);
+        s_httpapp_get_param.devInfo.data = &deviceInfo;
+        iwpriv_get(DEVICEINFO_GET, &s_httpapp_get_param);
     }
 
     sprintf((char *)fwverString,"%02x%02x", deviceInfo.romVersion, deviceInfo.patchVersion);
@@ -2375,7 +2402,9 @@ void TCPIP_HTTP_Print_ssid(HTTP_CONN_HANDLE connHandle)
     if (firstTime)
     {
         firstTime = false;
-        iwpriv_ssid_get(ssidString, &ssidLength);
+        s_httpapp_get_param.ssid.ssid = ssidString;
+        iwpriv_get(SSID_GET, &s_httpapp_get_param);
+        ssidLength = s_httpapp_get_param.ssid.ssidLen;
     }
     TCPIP_TCP_ArrayPut(sktHTTP, ssidString, ssidLength);
 }
@@ -2385,7 +2414,8 @@ void TCPIP_HTTP_Print_bssCount(HTTP_CONN_HANDLE connHandle)
     uint8_t bssCountString[4];
     TCP_SOCKET sktHTTP = TCPIP_HTTP_CurrentConnectionSocketGet(connHandle);
 
-    uitoa(iwpriv_numberofscanresults_get(), bssCountString);
+    iwpriv_get(SCANRESULTS_COUNT_GET, &s_httpapp_get_param);
+    uitoa(s_httpapp_get_param.scan.numberOfResults, bssCountString);
     TCPIP_TCP_StringPut(sktHTTP, bssCountString);
 }
 
@@ -2506,15 +2536,15 @@ void TCPIP_HTTP_Print_prevWLAN(HTTP_CONN_HANDLE connHandle)
 {
     TCP_SOCKET sktHTTP = TCPIP_HTTP_CurrentConnectionSocketGet(connHandle);
 
-    if (g_redirectionConfig.prevWLAN == WF_NETWORK_TYPE_INFRASTRUCTURE)
+    if (g_redirectionConfig.prevNetworkType == WF_NETWORK_TYPE_INFRASTRUCTURE)
     {
         TCPIP_TCP_StringPut(sktHTTP, (const uint8_t *)"Infrastructure (BSS)");
     }
-    else if (g_redirectionConfig.prevWLAN == WF_NETWORK_TYPE_ADHOC)
+    else if (g_redirectionConfig.prevNetworkType == WF_NETWORK_TYPE_ADHOC)
     {
         TCPIP_TCP_StringPut(sktHTTP, (const uint8_t *)"Ad-Hoc (IBSS)");
     }
-    else if (g_redirectionConfig.prevWLAN == WF_NETWORK_TYPE_SOFT_AP)
+    else if (g_redirectionConfig.prevNetworkType == WF_NETWORK_TYPE_SOFT_AP)
     {
         TCPIP_TCP_StringPut(sktHTTP, (const uint8_t *)"Soft AP (BSS)");
     }
@@ -2530,7 +2560,8 @@ void TCPIP_HTTP_Print_currWLAN(HTTP_CONN_HANDLE connHandle)
 
     // index.htm differs between Easy Configuration and Wi-Fi G Demo
     // in Wi-Fi G Demo it displays BSS information of MRF24WG.
-    iwpriv_config_read(&g_wifi_cfg);
+    s_httpapp_get_param.config.data = &g_wifi_cfg;
+    iwpriv_get(CONFIG_GET, &s_httpapp_get_param);
     if(g_wifi_cfg.networkType == WF_NETWORK_TYPE_ADHOC)
         TCPIP_TCP_StringPut(sktHTTP, (const uint8_t *)"Ad-Hoc (IBSS)");
     else if (g_wifi_cfg.networkType == WF_NETWORK_TYPE_INFRASTRUCTURE)
@@ -2547,15 +2578,15 @@ void TCPIP_HTTP_Print_nextWLAN(HTTP_CONN_HANDLE connHandle)
 {
     TCP_SOCKET sktHTTP = TCPIP_HTTP_CurrentConnectionSocketGet(connHandle);
 
-    if (g_redirectionConfig.type == WF_NETWORK_TYPE_INFRASTRUCTURE)
+    if (g_redirectionConfig.networkType == WF_NETWORK_TYPE_INFRASTRUCTURE)
     {
         TCPIP_TCP_StringPut(sktHTTP, (const uint8_t *)"Infrastructure (BSS)");
     }
-    else if (g_redirectionConfig.type == WF_NETWORK_TYPE_ADHOC)
+    else if (g_redirectionConfig.networkType == WF_NETWORK_TYPE_ADHOC)
     {
         TCPIP_TCP_StringPut(sktHTTP, (const uint8_t *)"Ad-Hoc (IBSS)");
     }
-    else if (g_redirectionConfig.type == WF_NETWORK_TYPE_SOFT_AP)
+    else if (g_redirectionConfig.networkType == WF_NETWORK_TYPE_SOFT_AP)
     {
         TCPIP_TCP_StringPut(sktHTTP, (const uint8_t *)"Soft AP (BSS)");
     }
@@ -2569,8 +2600,9 @@ void TCPIP_HTTP_Print_currPrivacy(HTTP_CONN_HANDLE connHandle)
 {
     TCP_SOCKET sktHTTP = TCPIP_HTTP_CurrentConnectionSocketGet(connHandle);
 
-    iwpriv_config_read(&g_wifi_cfg);
-    switch (g_wifi_cfg.SecurityMode)
+    s_httpapp_get_param.config.data = &g_wifi_cfg;
+    iwpriv_get(CONFIG_GET, &s_httpapp_get_param);
+    switch (g_wifi_cfg.securityMode)
     {
         case DRV_WIFI_SECURITY_OPEN:
             TCPIP_TCP_StringPut(sktHTTP, (const uint8_t *)"None");

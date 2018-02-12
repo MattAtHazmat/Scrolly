@@ -52,7 +52,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system/console/sys_console.h"
 
 #include "driver/wifi/mrf24w/src/drv_wifi_scan_helper.h"
-#include "driver/wifi/mrf24w/src/drv_wifi_iwpriv.h"
+//#include "driver/wifi/mrf24w/src/drv_wifi_iwpriv.h"
 
 /*** APP Specific Ports System Service Configuration ***/
 //#define SYS_PORT_E_TRIS         0x0000
@@ -96,7 +96,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define WF_ASSERT(condition, msg) DRV_WIFI_ASSERT(condition, msg)
 
 typedef DRV_WIFI_SCAN_RESULT WF_SCAN_RESULT;
-typedef DRV_WIFI_CONFIG_DATA WF_CONFIG_DATA;
+//typedef DRV_WIFI_CONFIG_DATA WF_CONFIG_DATA;
 typedef DRV_WIFI_DEVICE_INFO WF_DEVICE_INFO;
 typedef DRV_WIFI_ADHOC_NETWORK_CONTEXT WF_ADHOC_NETWORK_CONTEXT;
 

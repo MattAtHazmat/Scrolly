@@ -2,7 +2,7 @@
  System Interrupts File
 
   File Name:
-    system_int.c
+    system_interrupt.c
 
   Summary:
     Raw ISR definitions.
@@ -53,7 +53,6 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
  *******************************************************************************/
 // DOM-IGNORE-END
 
-
 // *****************************************************************************
 // *****************************************************************************
 // Section: Included Files
@@ -62,7 +61,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 #include <xc.h>
 #include <sys/attribs.h>
-#include "app.h"
+#include "net.h"
 #include "scroller.h"
 #include "timeywimey.h"
 #include "system_definitions.h"
@@ -72,17 +71,21 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // Section: System Interrupt Vector Functions
 // *****************************************************************************
 // *****************************************************************************
-void __ISR(_TIMER_1_VECTOR, ipl4AUTO) _IntHandlerDrvTmrInstance0(void)
+void __ISR(_EXTERNAL_1_VECTOR, IPL4AUTO) _IntHandlerExternalInterruptInstance0(void)
 {
-
-    DRV_TMR_Tasks_ISR(sysObj.drvTmr0);
-
+    PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_1);
+    DRV_WIFI_MRF24W_ISR((SYS_MODULE_OBJ)0);
 }
-void __ISR(_TIMER_3_VECTOR, ipl1AUTO) _IntHandlerDrvTmrInstance1(void)
+
+
+void __ISR(_TIMER_1_VECTOR, ipl4AUTO) IntHandlerDrvTmrInstance0(void)
 {
-
-    DRV_TMR_Tasks_ISR(sysObj.drvTmr1);
-
+    DRV_TMR_Tasks(sysObj.drvTmr0);
+}
+    
+void __ISR(_TIMER_3_VECTOR, ipl1AUTO) IntHandlerDrvTmrInstance1(void)
+{
+    DRV_TMR_Tasks(sysObj.drvTmr1);
 }
  
 void __ISR(_SPI_4_VECTOR, ipl1AUTO) _IntHandlerSPIInstance1(void)
@@ -96,15 +99,20 @@ void __ISR(_FCE_VECTOR, ipl4AUTO) _IntHandlerDrvNvm (void)
 }
 
 
+void __ISR(_DMA0_VECTOR, ipl6AUTO) _IntHandlerSysDmaCh0(void)
+{          
+    SYS_DMA_TasksISR(sysObj.sysDma, DMA_CHANNEL_0);
+}
 
-
-void __ISR(_EXTERNAL_1_VECTOR, ipl3AUTO) _InterruptHandler_MRF24W_Ext1(void)
-{
-    DRV_WIFI_MRF24W_ISR((SYS_MODULE_OBJ)0);
+void __ISR(_DMA1_VECTOR, ipl7AUTO) _IntHandlerSysDmaCh1(void)
+{          
+    SYS_DMA_TasksISR(sysObj.sysDma, DMA_CHANNEL_1);
 }
 
 
- 
+
+
+
 /*******************************************************************************
  End of File
 */

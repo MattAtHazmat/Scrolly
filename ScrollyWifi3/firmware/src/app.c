@@ -52,7 +52,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define IS_MDNS_RUN() false
 #define TCPIP_MDNS_ServiceDeregister(a) do {} while (0)
 #define TCPIP_MDNS_ServiceRegister(a, b, c, d, e, f, g, h) do {} while (0)
-#endif /* defined(TCPIP_STACK_USE_ZEROCONF_MDNS_SD)                           */
+#endif /* defined(TCPIP_STACK_USE_ZEROCONF_MDNS_SD) */
 
 #define IS_WF_INTF(x) ((strcmp(x, "MRF24W") == 0) || (strcmp(x, "MRF24WN") == 0))
 
@@ -63,7 +63,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 bool g_redirect_signal = false;
 BSP_LED_STATE LEDstate = BSP_LED_STATE_OFF;
-WF_CONFIG_DATA g_wifi_cfg;
+//WF_CONFIG_DATA g_wifi_cfg;
 WF_DEVICE_INFO g_wifi_deviceInfo;
 WF_REDIRECTION_CONFIG g_redirectionConfig;
 
@@ -78,7 +78,7 @@ WF_REDIRECTION_CONFIG g_redirectionConfig;
 
   Remarks:
     Application strings and buffers are be defined outside this structure.
-                                                                              */
+ */
 static APP_DATA appData;
 
 static void APP_WIFI_RedirectionConfigInit(void);
@@ -103,17 +103,17 @@ static void APP_WIFIG_SSID_Set(TCPIP_NET_HANDLE netH);
 
   Remarks:
     See prototype in app.h.
-                                                                              */
+ */
 void APP_Initialize(void)
 {
-    /* Following PORT initialization functions are for the 3 LEDs             */
-    /* PORT E Initialization                                                  */
+    /* Following PORT initialization functions are for the 3 LEDs */
+    /* PORT E Initialization */
     PLIB_PORTS_OpenDrainEnable(PORTS_ID_0, PORT_CHANNEL_E, SYS_PORT_E_ODC);
     PLIB_PORTS_Toggle(PORTS_ID_0, PORT_CHANNEL_E, SYS_PORT_E_LAT);
     //PLIB_PORTS_DirectionOutputSet(PORTS_ID_0, PORT_CHANNEL_E, SYS_PORT_E_TRIS ^ 0xFFFF);
     PLIB_PORTS_PinDirectionOutputSet(PORTS_ID_0, PORT_CHANNEL_E, 0);
 
-    /* PORT F Initialization                                                  */
+    /* PORT F Initialization */
     PLIB_PORTS_OpenDrainEnable(PORTS_ID_0, PORT_CHANNEL_F, SYS_PORT_F_ODC);
     PLIB_PORTS_Toggle(PORTS_ID_0, PORT_CHANNEL_F, SYS_PORT_F_LAT);
     //PLIB_PORTS_DirectionOutputSet(PORTS_ID_0, PORT_CHANNEL_F, SYS_PORT_F_TRIS ^ 0xFFFF);
@@ -123,11 +123,11 @@ void APP_Initialize(void)
     /* 
      * Intialize the app state to wait for
      * media attach.
-                                                                              */
+     */
     appData.state = APP_MOUNT_DISK;
     appData.scanState = APP_WIFI_PRESCAN_INIT;
 
-    iwpriv_initialconn_set(false);
+    //iwpriv_initialconn_set(false);
 }
 
 /*******************************************************************************
@@ -136,7 +136,7 @@ void APP_Initialize(void)
 
   Remarks:
     See prototype in app.h.
-                                                                              */
+ */
 void APP_Tasks(void)
 {
     static bool isWiFiPowerSaveConfigured = false;
@@ -149,7 +149,6 @@ void APP_Tasks(void)
     switch (appData.state)
     {
         case APP_MOUNT_DISK:
-        {
             if(SYS_FS_Mount(SYS_FS_NVM_VOL, LOCAL_WEBSITE_PATH_FS, MPFS2, 0, NULL) == 0)
             {
                 SYS_CONSOLE_PRINT("SYS_Initialize: The %s File System is mounted.\r\n", SYS_FS_MPFS_STRING);
@@ -160,9 +159,8 @@ void APP_Tasks(void)
                 SYS_CONSOLE_PRINT("SYS_Initialize: Mount the %s File System: pending!\r\n", SYS_FS_MPFS_STRING);
             }
             break;
-        }
-        case APP_TCPIP_WAIT_INIT: 
-        {
+
+        case APP_TCPIP_WAIT_INIT: {
             SYS_STATUS tcpipStat = TCPIP_STACK_Status(sysObj.tcpip);
             if (tcpipStat < 0)
             {
@@ -175,109 +173,86 @@ void APP_Tasks(void)
             }
             break;
         }
+
         case APP_WIFI_CONFIG:
-        {
-            /*                                                                */
-            /* Following "if condition" is useless when demo firstly          */
-            /* boots up, since stack's status has already been checked in     */
-            /* APP_TCPIP_WAIT_INIT. But it is necessary in redirection or     */
-            /* Wi-Fi interface reset due to connection errors.                */
-            /*                                                                */
-            if (iwpriv_initstatus_get() == IWPRIV_READY) 
-            {
+            /*
+             * Following "if condition" is useless when demo firstly
+             * boots up, since stack's status has already been checked in
+             * APP_TCPIP_WAIT_INIT. But it is necessary in redirection or
+             * Wi-Fi interface reset due to connection errors.
+             */
+            if (iwpriv_initstatus_get() == IWPRIV_READY) {
                 iwpriv_devinfo_get(&g_wifi_deviceInfo);
                 defaultIPWiFi.Val = TCPIP_STACK_NetAddress(netHandleWiFi);
                 netHandleWiFi = TCPIP_STACK_NetHandleGet(WIFI_INTERFACE_NAME);
 
-                /* initialize redirection variable                            */
+                // initialize redirection variable
                 APP_WIFIG_SSID_Set(netHandleWiFi);
                 APP_WIFI_RedirectionConfigInit();
 
-                if (!g_redirect_signal) 
-                {
+                if (!g_redirect_signal) {
                     iwpriv_prescan_set(true);
                     appData.state = APP_WIFI_PRESCAN;
-                } 
-                else 
-                {
+                } else {
                     g_redirect_signal = false;
                     APP_TCPIP_IFModules_Enable(netHandleWiFi);
                     appData.state = APP_TCPIP_TRANSACT;
                     break;
                 }
-            } 
-            else 
-            {
+            } else {
                 break;
             }
-        }
-        case APP_WIFI_PRESCAN: 
-        {
-            /* if iwpriv_prescan_set(false) was called,                       */
-            /* this state would just run once and pass,                       */
-            /* APP_WIFI_Prescan() function would not actually                 */
-            /* do anything                                                    */
+
+        case APP_WIFI_PRESCAN: {
+            // if iwpriv_prescan_set(false) was called,
+            // this state would just run once and pass,
+            // APP_WIFI_Prescan() function would not actually
+            // do anything
             uint8_t scanStatus = APP_WIFI_Prescan();
-            if (scanStatus == IWPRIV_READY) 
-            {
+            if (scanStatus == IWPRIV_READY) {
                 appData.state = APP_TCPIP_MODULES_ENABLE;
-                SYS_CONSOLE_MESSAGE("Wi-Fi Prescan Complete.\r\n");
-            } 
-            else if (scanStatus == IWPRIV_ERROR) 
-            {
+            } else if (scanStatus == IWPRIV_ERROR) {
                 SYS_CONSOLE_MESSAGE("Wi-Fi Prescan Error.\r\n");
                 appData.state = APP_TCPIP_MODULES_ENABLE;
-            } 
-            else 
-            {
+            } else {
                 break;
             }
         }
+
         case APP_TCPIP_MODULES_ENABLE:
-        {
-            /* check the available interfaces                                 */
+            // check the available interfaces
             nNets = TCPIP_STACK_NumberOfNetworksGet();
             for (i = 0; i < nNets; ++i)
-            {
-                SYS_CONSOLE_MESSAGE("Enabling TCP/IP Modules.\r\n");
                 APP_TCPIP_IFModules_Enable(TCPIP_STACK_IndexToNet(i));
-            }
             appData.state = APP_TCPIP_TRANSACT;
-        }
+
         case APP_TCPIP_TRANSACT:
-        {
-            /* wait for redirection command from custom_http_app.c            */
-            if (iwpriv_connstatus_get() == IWPRIV_CONNECTION_FAILED || g_redirect_signal) 
-            {
+            // wait for redirection command from custom_http_app.c
+            if (iwpriv_connstatus_get() == IWPRIV_CONNECTION_FAILED || g_redirect_signal) {
                 APP_TCPIP_IFModules_Disable(netHandleWiFi);
                 APP_IF_Down(netHandleWiFi);
                 APP_IF_Up(netHandleWiFi);
                 isWiFiPowerSaveConfigured = false;
-                SYS_CONSOLE_MESSAGE("Wi-Fi Connection failed.\r\n");
                 appData.state = APP_WIFI_CONFIG;
                 break;
-            } 
-            else if (iwpriv_connstatus_get() == IWPRIV_CONNECTION_REESTABLISHED) 
-            {
-                /* restart dhcp client and config power save                  */
-                if (!iwpriv_is_servermode()) 
-                {
+            } else if (iwpriv_connstatus_get() == IWPRIV_CONNECTION_REESTABLISHED) {
+                // restart dhcp client and config power save
+                if (!iwpriv_is_servermode()) {
                     TCPIP_DHCP_Disable(netHandleWiFi);
                     TCPIP_DHCP_Enable(netHandleWiFi);
                     isWiFiPowerSaveConfigured = false;
                 }
             }
 
-            /*                                                                */
-            /* Following for loop is to deal with manually controlling        */
-            /* interface down/up (for example, through console commands       */
-            /* or web page).                                                  */
-            /*                                                                */
+            /*
+             * Following for loop is to deal with manually controlling
+             * interface down/up (for example, through console commands
+             * or web page).
+             */
             nNets = TCPIP_STACK_NumberOfNetworksGet();
             for (i = 0; i < nNets; ++i)
             {
                 TCPIP_NET_HANDLE netH = TCPIP_STACK_IndexToNet(i);
-                /* turn on LED2 if the network is ready. */
                 BSP_LEDStateSet(BSP_LED_2, TCPIP_STACK_NetIsReady(netH));
                 if (!TCPIP_STACK_NetIsUp(netH) && wasNetUp[i])
                 {
@@ -285,40 +260,40 @@ void APP_Tasks(void)
                     wasNetUp[i] = false;
                     APP_TCPIP_IFModules_Disable(netH);
                     if (IS_WF_INTF(netName))
-                    {
                         isWiFiPowerSaveConfigured = false;
-                    }
                 }
+
                 if (TCPIP_STACK_NetIsUp(netH) && !wasNetUp[i])
                 {
                     wasNetUp[i] = true;
                     APP_TCPIP_IFModules_Enable(netH);
                 }
             }
-            /*                                                                */
-            /* If we get a new IP address that is different than the default  */
-            /* one, we will run PowerSave configuration.                      */
-            /*                                                                */
+
+            /*
+             * If we get a new IP address that is different than the default one,
+             * we will run PowerSave configuration.
+             */
             if (!isWiFiPowerSaveConfigured &&
                 TCPIP_STACK_NetIsUp(netHandleWiFi) &&
-                (TCPIP_STACK_NetAddress(netHandleWiFi) != defaultIPWiFi.Val)) 
-            {
+                (TCPIP_STACK_NetAddress(netHandleWiFi) != defaultIPWiFi.Val)) {
                 APP_WIFI_PowerSave_Config(true);
                 isWiFiPowerSaveConfigured = true;
             }
+
             APP_WIFI_DHCPS_Sync(netHandleWiFi);
+
             if (SYS_TMR_TickCountGet() - startTick >= SYS_TMR_TickCounterFrequencyGet() / 2ul)
             {
                 startTick = SYS_TMR_TickCountGet();
                 LEDstate ^= BSP_LED_STATE_ON;
                 BSP_LEDStateSet(APP_TCPIP_LED_1, LEDstate);
             }
+
             break;
-        }
+
         default:
-        {
             break;
-        }
     }
 }
 
@@ -358,7 +333,7 @@ uint8_t APP_WIFI_Prescan(void)
              * Wi-Fi G demo doesn't have the console to display scan results,
              * but it still needs to run iwpriv_scanresults_display() to store
              * the results for web page display.
-                                                                              */
+             */
             if (iwpriv_scanresults_display() == IWPRIV_IN_PROGRESS) {
                 break;
             } else { // IWPRIV_READY
@@ -395,7 +370,7 @@ uint8_t APP_WIFI_Prescan(void)
 
   Remarks:
     Initialize redirection configuration variable
-                                                                              */
+ */
 static void APP_WIFI_RedirectionConfigInit(void)
 {
     g_redirectionConfig.ssid[0] = 0;
@@ -468,7 +443,7 @@ static void APP_TCPIP_IFModules_Enable(TCPIP_NET_HANDLE netH)
     /*
      * If it's not Wi-Fi interface, then leave it to the TCP/IP stack
      * to configure its DHCP server/client status.
-                                                                              */
+     */
     if (IS_WF_INTF(netName)) {
         if (iwpriv_is_servermode()) {
             TCPIP_DHCP_Disable(netH); // must stop DHCP client first

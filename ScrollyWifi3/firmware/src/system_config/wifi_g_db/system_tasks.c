@@ -45,7 +45,6 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
  *******************************************************************************/
 // DOM-IGNORE-END
 
-
 // *****************************************************************************
 // *****************************************************************************
 // Section: Included Files
@@ -75,8 +74,10 @@ void SYS_Tasks ( void )
     /* Maintain system services */
     SYS_DEVCON_Tasks(sysObj.sysDevcon);
     /* Maintain the DMA system state machine. */
+    
     SYS_DMA_Tasks(sysObj.sysDma);
     SYS_FS_Tasks();
+    /* SYS_TMR Device layer tasks routine */ 
     SYS_TMR_Tasks(sysObj.sysTmr);
 
     /* Maintain Device Drivers */
@@ -87,9 +88,8 @@ void SYS_Tasks ( void )
     /* Maintain the TCP/IP Stack*/
     TCPIP_STACK_Task(sysObj.tcpip);
 
-
     /* Maintain the application's state machine. */
-    APP_Tasks();
+    NET_Tasks();
     SCROLLER_Tasks();
     TIMEYWIMEY_Tasks();
 }

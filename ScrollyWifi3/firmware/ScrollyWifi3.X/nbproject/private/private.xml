@@ -3,14 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/mjb/Projects/Scrolly/ScrollyWifi3/firmware/src/system_config/wifi_g_db/system_tasks.c</file>
-            <file>file:/home/mjb/Projects/Scrolly/ScrollyWifi3/firmware/src/timeywimey.c</file>
             <file>file:/home/mjb/Projects/Scrolly/ScrollyWifi3/firmware/src/system_config/wifi_g_db/framework/driver/spi/dynamic/drv_spi_tasks.c</file>
-            <file>file:/home/mjb/Projects/Scrolly/ScrollyWifi3/firmware/src/system_config/wifi_g_db/system_config.h</file>
-            <file>file:/home/mjb/Projects/Scrolly/ScrollyWifi3/firmware/src/main.c</file>
             <file>file:/home/mjb/Projects/Scrolly/ScrollyWifi3/firmware/src/scroller.c</file>
-            <file>file:/home/mjb/microchip/harmony/v1_06_02/framework/peripheral/spi/processor/spi_p32mx695f512h.h</file>
-            <file>file:/home/mjb/microchip/harmony/v1_06_02/framework/peripheral/int/templates/int_SourceFlag_Default.h</file>
+            <file>file:/home/mjb/Projects/Scrolly/ScrollyWifi3/firmware/src/LEDDisplay.c</file>
+            <file>file:/home/mjb/Projects/Scrolly/ScrollyWifi3/firmware/src/timeyWimey.c</file>
+            <file>file:/home/mjb/microchip/harmony/v1_06_02/framework/system/tmr/src/sys_tmr.c</file>
         </group>
     </open-files>
 </project-private>

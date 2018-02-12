@@ -18,7 +18,7 @@
     definitions for build-time configuration options that are not instantiated
     until used by another MPLAB Harmony module or application.
     
-    Created with MPLAB Harmony Version 1.06
+    Created with MPLAB Harmony Version 1.08.01
 *******************************************************************************/
 
 // DOM-IGNORE-BEGIN
@@ -49,13 +49,6 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #ifndef _SYSTEM_CONFIG_H
 #define _SYSTEM_CONFIG_H
 
-/* This is a temporary workaround for an issue with the peripheral library "Exists"
-   functions that causes superfluous warnings.  It "nulls" out the definition of
-   The PLIB function attribute that causes the warning.  Once that issue has been
-   resolved, this definition should be removed. */
-#define _PLIB_UNSUPPORTED
-
-
 // *****************************************************************************
 // *****************************************************************************
 // Section: Included Files
@@ -64,25 +57,32 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 /*  This section Includes other configuration headers necessary to completely
     define this configuration.
 */
-
 #include "bsp_config.h"
-#include <stddef.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <string.h>
 #include "private.h"
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus  // Provide C++ Compatibility
+
+extern "C" {
+
+#endif
+// DOM-IGNORE-END
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: System Service Configuration
 // *****************************************************************************
 // *****************************************************************************
-
+// *****************************************************************************
+/* Common System Service Configuration Options
+*/
+#define SYS_VERSION_STR           "1.08.01"
+#define SYS_VERSION               10801
 
 // *****************************************************************************
 /* Clock System Service Configuration Options
 */
 #define SYS_CLK_FREQ                        96000000ul
-#define SYS_CLK_BUS_PERIPHERAL_1            48000000ul
+#define SYS_CLK_BUS_PERIPHERAL_1            96000000ul
 #define SYS_CLK_UPLL_BEFORE_DIV2_FREQ       48000000ul
 #define SYS_CLK_CONFIG_PRIMARY_XTAL         8000000ul
 #define SYS_CLK_CONFIG_SECONDARY_XTAL       32768ul
@@ -91,7 +91,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define SYS_INT                     true
 
 /*** Ports System Service Configuration ***/
-#define SYS_PORT_AD1PCFG        ~0x0
+#define SYS_PORT_AD1PCFG        ~0xbfff
 #define SYS_PORT_CNPUE          0x0
 #define SYS_PORT_CNEN           0x0
 
@@ -144,11 +144,10 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // Section: Driver Configuration
 // *****************************************************************************
 // *****************************************************************************
-
 /*** Timer Driver Configuration ***/
+#define DRV_TMR_INTERRUPT_MODE             true
 #define DRV_TMR_INSTANCES_NUMBER           2
 #define DRV_TMR_CLIENTS_NUMBER             1
-#define DRV_TMR_INTERRUPT_MODE             true
 
 /*** Timer Driver 0 Configuration ***/
 #define DRV_TMR_PERIPHERAL_ID_IDX0          TMR_ID_1
@@ -171,15 +170,13 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define DRV_TMR_INTERRUPT_PRIORITY_IDX1     INT_PRIORITY_LEVEL1
 #define DRV_TMR_INTERRUPT_SUB_PRIORITY_IDX1 INT_SUBPRIORITY_LEVEL0
 #define DRV_TMR_CLOCK_SOURCE_IDX1           DRV_TMR_CLKSOURCE_INTERNAL
-#define DRV_TMR_PRESCALE_IDX1               TMR_PRESCALE_VALUE_16
+#define DRV_TMR_PRESCALE_IDX1               TMR_PRESCALE_VALUE_256
 #define DRV_TMR_OPERATION_MODE_IDX1         DRV_TMR_OPERATION_MODE_32_BIT
 #define DRV_TMR_ASYNC_WRITE_ENABLE_IDX1     false
 #define DRV_TMR_POWER_STATE_IDX1            SYS_MODULE_POWER_RUN_FULL
  
  
- 
 /*** NVM Driver Configuration ***/
-
 
 #define DRV_NVM_INSTANCES_NUMBER     	1
 #define DRV_NVM_CLIENTS_NUMBER        	2
@@ -191,17 +188,10 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define DRV_NVM_MEDIA_SIZE              64
 #define DRV_NVM_MEDIA_START_ADDRESS     0x9D000000
 
-#define DRV_NVM_ROW_SIZE                512
-#define DRV_NVM_PAGE_SIZE             	4096
-#define DRV_NVM_PROGRAM_UNLOCK_KEY1     0xAA996655
-#define DRV_NVM_PROGRAM_UNLOCK_KEY2     0x556699AA
-
 #define DRV_NVM_ERASE_WRITE_ENABLE
 
 
 #define DRV_NVM_SYS_FS_REGISTER
-
-
 
 
 
@@ -217,7 +207,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define DRV_SPI_EBM 				1
 #define DRV_SPI_8BIT 				1
 #define DRV_SPI_16BIT 				0
-#define DRV_SPI_32BIT 				1
+#define DRV_SPI_32BIT 				0
 #define DRV_SPI_DMA 				1
 
 /*** SPI Driver Static Allocation Options ***/
@@ -225,12 +215,12 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define DRV_SPI_CLIENTS_NUMBER 			2
 #define DRV_SPI_ELEMENTS_PER_QUEUE 		10
 /*** SPI Driver DMA Options ***/
-#define DRV_SPI_DMA_TXFER_SIZE 			PLIB_DMA_MAX_TRF_SIZE
-#define DRV_SPI_DMA_DUMMY_BUFFER_SIZE   PLIB_DMA_MAX_TRF_SIZE
+#define DRV_SPI_DMA_TXFER_SIZE 			8192
+#define DRV_SPI_DMA_DUMMY_BUFFER_SIZE 		8192
 /* SPI Driver Instance 0 Configuration */
 #define DRV_SPI_SPI_ID_IDX0 			SPI_ID_2
 #define DRV_SPI_TASK_MODE_IDX0 			DRV_SPI_TASK_MODE_POLLED
-#define DRV_SPI_SPI_MODE_IDX0           DRV_SPI_MODE_MASTER
+#define DRV_SPI_SPI_MODE_IDX0   DRV_SPI_MODE_MASTER
 #define DRV_SPI_ALLOW_IDLE_RUN_IDX0     false
 #define DRV_SPI_SPI_PROTOCOL_TYPE_IDX0 		DRV_SPI_PROTOCOL_TYPE_STANDARD
 #define DRV_SPI_COMM_WIDTH_IDX0 		SPI_COMMUNICATION_WIDTH_8BITS
@@ -238,17 +228,17 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define DRV_SPI_BAUD_RATE_IDX0 			8000000
 #define DRV_SPI_BUFFER_TYPE_IDX0 		DRV_SPI_BUFFER_TYPE_ENHANCED
 #define DRV_SPI_CLOCK_MODE_IDX0 		DRV_SPI_CLOCK_MODE_IDLE_HIGH_EDGE_FALL
-#define DRV_SPI_INPUT_PHASE_IDX0 		SPI_INPUT_SAMPLING_PHASE_IN_MIDDLE
+#define DRV_SPI_INPUT_PHASE_IDX0 			SPI_INPUT_SAMPLING_PHASE_AT_END
 #define DRV_SPI_QUEUE_SIZE_IDX0 		10
 #define DRV_SPI_RESERVED_JOB_IDX0 		1
 /* SPI Driver Instance 1 Configuration */
 #define DRV_SPI_SPI_ID_IDX1 			SPI_ID_4
 #define DRV_SPI_TASK_MODE_IDX1 			DRV_SPI_TASK_MODE_ISR
-#define DRV_SPI_SPI_MODE_IDX1           DRV_SPI_MODE_MASTER
+#define DRV_SPI_SPI_MODE_IDX1   DRV_SPI_MODE_MASTER
 #define DRV_SPI_ALLOW_IDLE_RUN_IDX1     false
 #define DRV_SPI_SPI_PROTOCOL_TYPE_IDX1 		DRV_SPI_PROTOCOL_TYPE_STANDARD
-#define DRV_SPI_COMM_WIDTH_IDX1 		SPI_COMMUNICATION_WIDTH_32BITS
-#define DRV_SPI_SPI_CLOCK_IDX1 			CLK_BUS_PERIPHERAL_1
+#define DRV_SPI_COMM_WIDTH_IDX1 		SPI_COMMUNICATION_WIDTH_8BITS
+#define DRV_SPI_SPI_CLOCK_IDX1 			CLK_BUS_PERIPHERAL_7
 #define DRV_SPI_BAUD_RATE_IDX1 			6400000
 #define DRV_SPI_BUFFER_TYPE_IDX1 		DRV_SPI_BUFFER_TYPE_STANDARD
 #define DRV_SPI_CLOCK_MODE_IDX1 		DRV_SPI_CLOCK_MODE_IDLE_LOW_EDGE_RISE
@@ -264,10 +254,11 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define DRV_SPI_TX_DMA_CHANNEL_IDX1 		DMA_CHANNEL_1
 #define DRV_SPI_TX_DMA_THRESHOLD_IDX1 		4
 #define DRV_SPI_RX_DMA_CHANNEL_IDX1 		DMA_CHANNEL_0
-#define DRV_SPI_RX_DMA_THRESHOLD_IDX1 		4
+#define DRV_SPI_RX_DMA_THRESHOLD_IDX1 		0
 
 /*** Wi-Fi Driver Configuration ***/
-#define WF_CONFIG_MHC
+
+#define DRV_WIFI_CONFIG_MHC
 
 #define DRV_WIFI_ASSERT(condition, msg) DRV_WIFI_Assert(condition, msg, __FILE__, __LINE__)
 
@@ -275,34 +266,31 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define DRV_WIFI_SPI_INSTANCE sysObj.spiObjectIdx0
 
 
-#define MRF_INT_SOURCE INT_SOURCE_EXTERNAL_1
-#define MRF_INT_VECTOR INT_VECTOR_INT1
 
-// IO mapping for general control pins, including CS, RESET and HIBERNATE
-// MRF24W in SPI2 slot
+
+// I/O mappings for general control pins, including CS, HIBERNATE, RESET and INTERRUPT.
 #define WF_CS_PORT_CHANNEL PORT_CHANNEL_G
 #define WF_CS_BIT_POS      9
-
-#define WF_RESET_PORT_CHANNEL PORT_CHANNEL_D
-#define WF_RESET_BIT_POS      1
 
 #define WF_HIBERNATE_PORT_CHANNEL PORT_CHANNEL_E
 #define WF_HIBERNATE_BIT_POS      4
 
-#define WF_INT_PRIORITY     3
-#define WF_INT_SUBPRIORITY  1
+#define WF_RESET_PORT_CHANNEL PORT_CHANNEL_D
+#define WF_RESET_BIT_POS      1
+
 #define WF_INT_PORT_CHANNEL PORT_CHANNEL_D
 #define WF_INT_BIT_POS      8
 
-#define WF_DEFAULT_NETWORK_TYPE        DRV_WIFI_NETWORK_TYPE_INFRASTRUCTURE
+#define MRF_INT_SOURCE INT_SOURCE_EXTERNAL_1
+#define MRF_INT_VECTOR INT_VECTOR_INT1
+
 #ifndef WF_DEFAULT_SSID_NAME
     #define WF_DEFAULT_SSID_NAME           "MicrochipDemoApp"
 #endif
 #define WF_DEFAULT_LIST_RETRY_COUNT    (DRV_WIFI_RETRY_FOREVER) /* Number (1..255) of times to try to connect to the SSID when using Infrastructure network type */
 #define WF_DEFAULT_CHANNEL_LIST        {} /* Channel list for Domain - use default in module */
-
 #ifndef WF_DEFAULT_WIFI_SECURITY_MODE
-    #define WF_DEFAULT_WIFI_SECURITY_MODE  DRV_WIFI_SECURITY_WPA2_WITH_PASS_PHRASE
+#define WF_DEFAULT_WIFI_SECURITY_MODE  DRV_WIFI_SECURITY_WPA2_WITH_PASS_PHRASE
 #endif
 #define WF_DEFAULT_WEP_PHRASE          "WEP Phrase" // default WEP passphrase
 #define WF_DEFAULT_WEP_KEY_40          "5AFB6C8E77" // default WEP40 key
@@ -312,10 +300,22 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #endif
 #define WF_DEFAULT_WPS_PIN             "12390212" // default WPS PIN
 
-#define WF_SAVE_WPS_CREDENTIALS        DRV_WIFI_DISABLED
+#define DRV_WIFI_DEFAULT_NETWORK_TYPE       DRV_WIFI_NETWORK_TYPE_INFRASTRUCTURE
+#define DRV_WIFI_DEFAULT_SSID               "MicrochipDemoApp"
+#define DRV_WIFI_DEFAULT_LIST_RETRY_COUNT   (DRV_WIFI_RETRY_FOREVER) /* Number (1..255) of times to try to connect to the SSID when using Infrastructure network type */
+#define DRV_WIFI_DEFAULT_CHANNEL_LIST       {} /* Channel list for Domain - use default in module */
 
-#define WF_CHECK_LINK_STATUS           DRV_WIFI_DISABLED /* Gets the MRF to check the link status relying on Tx failures. */
-#define WF_LINK_LOST_THRESHOLD         40 /* Consecutive Tx transmission failures to be considered the AP is gone away. */
+#define DRV_WIFI_DEFAULT_SECURITY_MODE      DRV_WIFI_SECURITY_WPA2_WITH_PASS_PHRASE
+#define DRV_WIFI_DEFAULT_WEP_PHRASE         "WEP Phrase" // default WEP passphrase
+#define DRV_WIFI_DEFAULT_WEP_KEY_40         "5AFB6C8E77" // default WEP40 key
+#define DRV_WIFI_DEFAULT_WEP_KEY_104        "90E96780C739409DA50034FCAA" // default WEP104 key
+#define DRV_WIFI_DEFAULT_PSK_PHRASE         "soopersekrit6" // customized WPA passphrase
+#define DRV_WIFI_DEFAULT_WPS_PIN            "12390212" // default WPS PIN
+
+#define DRV_WIFI_SAVE_WPS_CREDENTIALS       DRV_WIFI_DISABLED
+
+#define DRV_WIFI_CHECK_LINK_STATUS          DRV_WIFI_DISABLED /* Gets the MRF to check the link status relying on Tx failures. */
+#define DRV_WIFI_LINK_LOST_THRESHOLD        40 /* Consecutive Tx transmission failures to be considered the AP is gone away. */
 
 /* 
  * MRF24W FW has a built-in connection manager, and it is enabled by default.
@@ -326,11 +326,10 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
  * B) uint16_t DRV_WIFI_Scan(bool scanAll)
  * These APIs will return failure when the conflict occurs.
  */
-#define WF_MODULE_CONNECTION_MANAGER   DRV_WIFI_ENABLED
+#define DRV_WIFI_MODULE_CONNECTION_MANAGER  DRV_WIFI_ENABLED
 
 #define DRV_WIFI_DEFAULT_POWER_SAVE    DRV_WIFI_DISABLED /* DRV_WIFI_ENABLED or DRV_WIFI_DISABLED */
-#define WF_SOFTWARE_MULTICAST_FILTER   DRV_WIFI_ENABLED
-
+#define DRV_WIFI_SOFTWARE_MULTICAST_FILTER  DRV_WIFI_ENABLED
 
 
 
@@ -339,15 +338,17 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // Section: Middleware & Other Library Configuration
 // *****************************************************************************
 // *****************************************************************************
-
+/*** Crypto Library Configuration ***/
 
 #define HAVE_MCAPI
+#define NO_CERTS
+#define NO_PWDBASED
+#define NO_OLD_TLS
 #define NO_MD5
 #define NO_SHA
-#define NO_SHA256
 #define NO_AES
+#define NO_ASN
 #define NO_RSA
-#define NO_HMAC
 
 
 // *****************************************************************************
@@ -358,42 +359,57 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define TCPIP_STACK_USE_IPV4
 #define TCPIP_STACK_USE_TCP
 #define TCPIP_STACK_USE_UDP
-#define TCPIP_STACK_USE_ICMP_CLIENT
-#define TCPIP_STACK_DRAM_SIZE		        		39250
-#define TCPIP_STACK_DRAM_RUN_LIMIT		    		2048
-#define TCPIP_STACK_DRAM_DEBUG_ENABLE
+
 #define TCPIP_STACK_TICK_RATE		        		5
-
-#define TCPIP_STACK_MALLOC_FUNC                     malloc
-
-#define TCPIP_STACK_CALLOC_FUNC                     calloc
-
-#define TCPIP_STACK_FREE_FUNC                       free
+#define TCPIP_STACK_SECURE_PORT_ENTRIES             10
 
 /* TCP/IP stack event notification */
 #define TCPIP_STACK_USE_EVENT_NOTIFICATION
+#define TCPIP_STACK_USER_NOTIFICATION   false
+#define TCPIP_STACK_DOWN_OPERATION   true
+#define TCPIP_STACK_IF_UP_DOWN_OPERATION   true
+#define TCPIP_STACK_MAC_DOWN_OPERATION  true
+#define TCPIP_STACK_CONFIGURATION_SAVE_RESTORE   true
+/*** TCPIP Heap Configuration ***/
+#define TCPIP_STACK_USE_INTERNAL_HEAP
+#define TCPIP_STACK_DRAM_SIZE		        		39250
+#define TCPIP_STACK_DRAM_RUN_LIMIT		    		2048
+#define TCPIP_STACK_MALLOC_FUNC		    	malloc
+
+#define TCPIP_STACK_CALLOC_FUNC		    	calloc
+
+#define TCPIP_STACK_FREE_FUNC		    	free
+
+
+#define TCPIP_STACK_DRAM_DEBUG_ENABLE
+
+#define TCPIP_STACK_HEAP_USE_FLAGS                   TCPIP_STACK_HEAP_FLAG_ALLOC_UNCACHED
+
+#define TCPIP_STACK_HEAP_USAGE_CONFIG                TCPIP_STACK_HEAP_USE_DEFAULT
+
+#define TCPIP_STACK_SUPPORTED_HEAPS                  1
 
 /*** ARP Configuration ***/
-#define TCPIP_ARP_CACHE_ENTRIES                 	5
+#define TCPIP_ARP_CACHE_ENTRIES                 		5
 #define TCPIP_ARP_CACHE_DELETE_OLD		        	true
 #define TCPIP_ARP_CACHE_SOLVED_ENTRY_TMO			1200
 #define TCPIP_ARP_CACHE_PENDING_ENTRY_TMO			60
 #define TCPIP_ARP_CACHE_PENDING_RETRY_TMO			2
-#define TCPIP_ARP_CACHE_PERMANENT_QUOTA		    	50
-#define TCPIP_ARP_CACHE_PURGE_THRESHOLD		    	75
-#define TCPIP_ARP_CACHE_PURGE_QUANTA		    	1
-#define TCPIP_ARP_CACHE_ENTRY_RETRIES		    	3
+#define TCPIP_ARP_CACHE_PERMANENT_QUOTA		    		50
+#define TCPIP_ARP_CACHE_PURGE_THRESHOLD		    		75
+#define TCPIP_ARP_CACHE_PURGE_QUANTA		    		1
+#define TCPIP_ARP_CACHE_ENTRY_RETRIES		    		3
 #define TCPIP_ARP_GRATUITOUS_PROBE_COUNT			1
 #define TCPIP_ARP_TASK_PROCESS_RATE		        	2
 
 /*** DHCP Configuration ***/
 #define TCPIP_STACK_USE_DHCP_CLIENT
-#define TCPIP_DHCP_TIMEOUT                          2
+#define TCPIP_DHCP_TIMEOUT		        		2
 #define TCPIP_DHCP_TASK_TICK_RATE	    			200
 #define TCPIP_DHCP_HOST_NAME_SIZE	    			20
 #define TCPIP_DHCP_CLIENT_CONNECT_PORT  			68
 #define TCPIP_DHCP_SERVER_LISTEN_PORT				67
-#define TCPIP_DHCP_CLIENT_ENABLED             		true
+#define TCPIP_DHCP_CLIENT_ENABLED             			true
 
 
 
@@ -405,13 +421,14 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define TCPIP_DNS_CLIENT_CACHE_ENTRY_TMO			0
 #define TCPIP_DNS_CLIENT_CACHE_PER_IPV4_ADDRESS		5
 #define TCPIP_DNS_CLIENT_CACHE_PER_IPV6_ADDRESS		1
-#define TCPIP_DNS_CLIENT_OPEN_ADDRESS_TYPE			IP_ADDRESS_TYPE_IPV4
+#define TCPIP_DNS_CLIENT_ADDRESS_TYPE			    IP_ADDRESS_TYPE_IPV4
 #define TCPIP_DNS_CLIENT_CACHE_DEFAULT_TTL_VAL		1200
 #define TCPIP_DNS_CLIENT_CACHE_UNSOLVED_ENTRY_TMO	10
 #define TCPIP_DNS_CLIENT_LOOKUP_RETRY_TMO			5
 #define TCPIP_DNS_CLIENT_MAX_HOSTNAME_LEN			32
+#define TCPIP_DNS_CLIENT_MAX_SELECT_INTERFACES		4
 #define TCPIP_DNS_CLIENT_DELETE_OLD_ENTRIES			true
-
+#define TCPIP_DNS_CLIENT_USER_NOTIFICATION   false
 
 
 
@@ -429,12 +446,14 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define TCPIP_HTTP_MIN_CALLBACK_FREE				16
 #define TCPIP_HTTP_SKT_TX_BUFF_SIZE		    		0
 #define TCPIP_HTTP_SKT_RX_BUFF_SIZE		    		0
-#define TCPIP_HTTP_TLS_SKT_TX_BUFF_SIZE		        0
-#define TCPIP_HTTP_TLS_SKT_RX_BUFF_SIZE		        0
+#define TCPIP_HTTP_TLS_SKT_TX_BUFF_SIZE		                0
+#define TCPIP_HTTP_TLS_SKT_RX_BUFF_SIZE		                0
 #define TCPIP_HTTP_CONFIG_FLAGS		        		1
 #define TCPIP_HTTP_USE_POST
-//#define TCPIP_HTTP_USE_COOKIES
-#define TCPIP_HTTP_TASK_RATE                        33
+#define TCPIP_HTTP_USE_COOKIES
+#define TCPIP_HTTP_USE_BASE64_DECODE
+#define TCPIP_HTTP_USE_AUTHENTICATION
+#define TCPIP_HTTP_TASK_RATE					33
 
 
 
@@ -443,40 +462,41 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 /*** SNTP Configuration ***/
 #define TCPIP_STACK_USE_SNTP_CLIENT
-#define TCPIP_NTP_DEFAULT_IF                        "PIC32INT"
-#define TCPIP_NTP_VERSION                           3
-#define TCPIP_NTP_DEFAULT_CONNECTION_TYPE           IP_ADDRESS_TYPE_IPV4
-#define TCPIP_NTP_EPOCH                             2208988800ul
-#define TCPIP_NTP_REPLY_TIMEOUT                     6
-#define TCPIP_NTP_MAX_STRATUM                       15
-#define TCPIP_NTP_TIME_STAMP_TMO                    660
+#define TCPIP_NTP_DEFAULT_IF		        		"PIC32INT"
+#define TCPIP_NTP_VERSION             			    	4
+#define TCPIP_NTP_DEFAULT_CONNECTION_TYPE   			IP_ADDRESS_TYPE_IPV4
+#define TCPIP_NTP_EPOCH		                		2208988800ul
+#define TCPIP_NTP_REPLY_TIMEOUT		        		6
+#define TCPIP_NTP_MAX_STRATUM		        		15
+#define TCPIP_NTP_TIME_STAMP_TMO				660
 #define TCPIP_NTP_SERVER		        		"pool.ntp.org"
-#define TCPIP_NTP_SERVER_MAX_LENGTH                 30
-#define TCPIP_NTP_QUERY_INTERVAL                    600
-#define TCPIP_NTP_FAST_QUERY_INTERVAL               14
-#define TCPIP_NTP_TASK_TICK_RATE                    1100
-#define TCPIP_NTP_RX_QUEUE_LIMIT                    2
+#define TCPIP_NTP_SERVER_MAX_LENGTH				30
+#define TCPIP_NTP_QUERY_INTERVAL				600
+#define TCPIP_NTP_FAST_QUERY_INTERVAL	    			14
+#define TCPIP_NTP_TASK_TICK_RATE				1100
+#define TCPIP_NTP_RX_QUEUE_LIMIT				2
 
 
 
 
 /*** TCP Configuration ***/
 #define TCPIP_TCP_MAX_SEG_SIZE_TX		        	1460
-#define TCPIP_TCP_MAX_SEG_SIZE_RX_LOCAL		    	1460
+#define TCPIP_TCP_MAX_SEG_SIZE_RX_LOCAL		    		1460
 #define TCPIP_TCP_MAX_SEG_SIZE_RX_NON_LOCAL			536
 #define TCPIP_TCP_SOCKET_DEFAULT_TX_SIZE			512
 #define TCPIP_TCP_SOCKET_DEFAULT_RX_SIZE			512
+#define TCPIP_TCP_DYNAMIC_OPTIONS             			true
 #define TCPIP_TCP_START_TIMEOUT_VAL		        	1000
-#define TCPIP_TCP_DELAYED_ACK_TIMEOUT		    	100
-#define TCPIP_TCP_FIN_WAIT_2_TIMEOUT		    	5000
-#define TCPIP_TCP_KEEP_ALIVE_TIMEOUT		    	10000
-#define TCPIP_TCP_CLOSE_WAIT_TIMEOUT		    	200
-#define TCPIP_TCP_MAX_RETRIES		            	5
+#define TCPIP_TCP_DELAYED_ACK_TIMEOUT		    		100
+#define TCPIP_TCP_FIN_WAIT_2_TIMEOUT		    		5000
+#define TCPIP_TCP_KEEP_ALIVE_TIMEOUT		    		10000
+#define TCPIP_TCP_CLOSE_WAIT_TIMEOUT		    		200
+#define TCPIP_TCP_MAX_RETRIES		            		5
 #define TCPIP_TCP_MAX_UNACKED_KEEP_ALIVES			6
 #define TCPIP_TCP_MAX_SYN_RETRIES		        	2
 #define TCPIP_TCP_AUTO_TRANSMIT_TIMEOUT_VAL			40
 #define TCPIP_TCP_WINDOW_UPDATE_TIMEOUT_VAL			200
-#define TCPIP_TCP_MAX_SOCKETS		            	10
+#define TCPIP_TCP_MAX_SOCKETS		            		10
 #define TCPIP_TCP_TASK_TICK_RATE		        	5
 
 
@@ -488,32 +508,33 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define TCPIP_UDP_SOCKET_DEFAULT_TX_SIZE		    	512
 #define TCPIP_UDP_SOCKET_DEFAULT_TX_QUEUE_LIMIT    	 	3
 #define TCPIP_UDP_SOCKET_DEFAULT_RX_QUEUE_LIMIT			5
-#define TCPIP_UDP_SOCKET_POOL_BUFFERS		        	4
-#define TCPIP_UDP_SOCKET_POOL_BUFFER_SIZE		    	512
-
+#define TCPIP_UDP_USE_POOL_BUFFERS   false
 #define TCPIP_UDP_USE_TX_CHECKSUM             			true
 
 #define TCPIP_UDP_USE_RX_CHECKSUM             			true
 
 
 /*** Network Configuration Index 0 ***/
-#define TCPIP_NETWORK_DEFAULT_INTERFACE_NAME 		"MRF24W"
+#define TCPIP_NETWORK_DEFAULT_INTERFACE_NAME 			"MRF24W"
 #define TCPIP_IF_MRF24W
 #ifndef TCPIP_NETWORK_DEFAULT_HOST_NAME
-    #define TCPIP_NETWORK_DEFAULT_HOST_NAME 		"MCHPBOARD_W"
+    #define TCPIP_NETWORK_DEFAULT_HOST_NAME 			"MCHPBOARD_W"
 #endif
 #define TCPIP_NETWORK_DEFAULT_MAC_ADDR	 			0
 #define TCPIP_NETWORK_DEFAULT_IP_ADDRESS 			"0.0.0.0"
 #define TCPIP_NETWORK_DEFAULT_IP_MASK 				"255.255.255.0"
 #define TCPIP_NETWORK_DEFAULT_GATEWAY	 			"192.168.1.1"
-#define TCPIP_NETWORK_DEFAULT_DNS                   "192.168.1.1"
+#define TCPIP_NETWORK_DEFAULT_DNS 				"192.168.1.1"
 #define TCPIP_NETWORK_DEFAULT_SECOND_DNS 			"0.0.0.0"
 #define TCPIP_NETWORK_DEFAULT_POWER_MODE 			"full"
-#define TCPIP_NETWORK_DEFAULT_INTERFACE_FLAGS   		TCPIP_NETWORK_CONFIG_DHCP_CLIENT_ON
+#define TCPIP_NETWORK_DEFAULT_INTERFACE_FLAGS                       \
+                                                    TCPIP_NETWORK_CONFIG_DHCP_CLIENT_ON |\
+                                                    TCPIP_NETWORK_CONFIG_DNS_CLIENT_ON |\
+                                                    TCPIP_NETWORK_CONFIG_IP_STATIC
 #define TCPIP_NETWORK_DEFAULT_MAC_DRIVER 		    DRV_MRF24W_MACObject
 #define TCPIP_NETWORK_DEFAULT_IPV6_ADDRESS 			0
-#define TCPIP_NETWORK_DEFAULT_IPV6_PREFIX_LENGTH 		0
-#define TCPIP_NETWORK_DEFAULT_IPV6_GATEWAY 		    0
+#define TCPIP_NETWORK_DEFAULT_IPV6_PREFIX_LENGTH    
+#define TCPIP_NETWORK_DEFAULT_IPV6_GATEWAY 		        0
 
 
 /*** TCPIP SYS FS Wrapper ***/
@@ -525,11 +546,12 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define SYS_FS_FATFS_STRING					"FATFS"
 #define SYS_FS_MPFS_STRING					"MPFS2"
 
-#define APP_TCPIP_LED_1                     BSP_LED_0
-#define APP_TCPIP_LED_2                     BSP_LED_1
-#define APP_TCPIP_LED_3                     BSP_LED_2
+/* BSP LED Re-directs */
+#define APP_TCPIP_LED_1 BSP_LED_0
+#define APP_TCPIP_LED_2 BSP_LED_1
+#define APP_TCPIP_LED_3 BSP_LED_2
 
-#define APP_TCPIP_SWITCH_1                  BSP_SWITCH_0
+#define APP_TCPIP_SWITCH_1 BSP_SWITCH_0
 
 // *****************************************************************************
 /* BSP Configuration Options
@@ -539,6 +561,23 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 
 
+// *****************************************************************************
+// *****************************************************************************
+// Section: Application Configuration
+// *****************************************************************************
+// *****************************************************************************
+
+/*** Application Instance 0 Configuration ***/
+
+/*** Application Instance 1 Configuration ***/
+
+/*** Application Instance 2 Configuration ***/
+
+//DOM-IGNORE-BEGIN
+#ifdef __cplusplus
+}
+#endif
+//DOM-IGNORE-END
 
 
 #endif // _SYSTEM_CONFIG_H

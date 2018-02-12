@@ -45,7 +45,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 //DOM-IGNORE-END
 #include "driver/spi/src/dynamic/drv_spi_internal.h"
 #include <stdbool.h>
-#include "peripheral/spi/processor/spi_p32mx695f512h.h"
+
 // DMA Scratch Pad
 uint8_t sDrvSpiRxDummy[DRV_SPI_DMA_DUMMY_BUFFER_SIZE];
 uint8_t sDrvSpiTxDummy[DRV_SPI_DMA_DUMMY_BUFFER_SIZE];
@@ -53,12 +53,14 @@ uint8_t sDrvSpiTxDummy[DRV_SPI_DMA_DUMMY_BUFFER_SIZE];
 
 int32_t DRV_SPI_ISRMasterEBM8BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvInstance )    
 {
-    bool continueLoop;
+    volatile bool continueLoop;
+    
     /* Disable the interrupts */
     SYS_INT_SourceDisable(pDrvInstance->rxInterruptSource);
     SYS_INT_SourceDisable(pDrvInstance->txInterruptSource);
     SYS_INT_SourceDisable(pDrvInstance->errInterruptSource);
     do {
+        
         DRV_SPI_JOB_OBJECT * currentJob = pDrvInstance->currentJob;
         SPI_MODULE_ID spiId = pDrvInstance->spiId;
         /* Check for a new task */
@@ -66,7 +68,7 @@ int32_t DRV_SPI_ISRMasterEBM8BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvInsta
         {
             if (DRV_SPI_SYS_QUEUE_Dequeue(pDrvInstance->queue, (void *)&(pDrvInstance->currentJob)) != DRV_SPI_SYS_QUEUE_SUCCESS)
             {
-                SYS_ASSERT(false, "SPI Driver: Error in dequeing");
+                SYS_ASSERT(false, "\r\nSPI Driver: Error in dequeing.");
                 return 0;       
             }
             if (pDrvInstance->currentJob == NULL)
@@ -156,24 +158,26 @@ int32_t DRV_SPI_ISRMasterEBM8BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvInsta
                 
         continueLoop = false;
         /* Execute the sub tasks */
-        if 
+             if 
             (!txDMAInProgress &&
             (currentJob->dataLeftToTx +currentJob->dummyLeftToTx != 0)
             )
         {
             DRV_SPI_MasterEBMSend8BitISR(pDrvInstance);
         }
+        
         DRV_SPI_ISRErrorTasks(pDrvInstance);
-    /* Figure out how many bytes are left to be received */
-    size_t bytesLeft = currentJob->dataLeftToRx + currentJob->dummyLeftToRx;
-    // Check to see if we have any data left to receive and update the bytes left.
-
+        
+        /* Figure out how many bytes are left to be received */
+        volatile size_t bytesLeft = currentJob->dataLeftToRx + currentJob->dummyLeftToRx;
+        // Check to see if we have any data left to receive and update the bytes left.
 
         if ((bytesLeft != 0) && !rxDMAInProgress)
         {
             DRV_SPI_MasterEBMReceive8BitISR(pDrvInstance);
             bytesLeft = currentJob->dataLeftToRx + currentJob->dummyLeftToRx;
         }
+     
         if ((bytesLeft == 0) && !rxDMAInProgress && !txDMAInProgress)
         {
                     // Disable the interrupt, or more correctly don't re-enable it later*/
@@ -197,7 +201,7 @@ int32_t DRV_SPI_ISRMasterEBM8BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvInsta
                     /* Return the job back to the free queue*/
                     if (DRV_SPI_SYS_QUEUE_FreeElement(pDrvInstance->queue, currentJob) != DRV_SPI_SYS_QUEUE_SUCCESS)
                     {
-                        SYS_ASSERT(false, "SPI Driver: Queue free element error");
+                        SYS_ASSERT(false, "\r\nSPI Driver: Queue free element error.");
                         return 0;
                     }
                     /* Clean up */
@@ -223,32 +227,25 @@ int32_t DRV_SPI_ISRMasterEBM8BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvInsta
     
         /* Check to see if the interrupts would fire again if so just go back into 
            the loop instead of suffering the interrupt latency of exiting and re-entering*/
-        if (pDrvInstance->currentJob != NULL)
-        {
+        if ((pDrvInstance->currentJob != NULL) && !rxDMAInProgress && !txDMAInProgress)
+        {   
             /* Clear the Interrupts */
             SYS_INT_SourceStatusClear(pDrvInstance->rxInterruptSource);
             SYS_INT_SourceStatusClear(pDrvInstance->txInterruptSource);
             SYS_INT_SourceStatusClear(pDrvInstance->errInterruptSource);
             /* Interrupts should immediately become active again if they're in a fired condition */
-            if (((pDrvInstance->rxEnabled) && SYS_INT_SourceStatusGet(pDrvInstance->rxInterruptSource)) ||
-                ((pDrvInstance->txEnabled) && SYS_INT_SourceStatusGet(pDrvInstance->txInterruptSource)) ||
+            if ((SYS_INT_SourceStatusGet(pDrvInstance->rxInterruptSource)) ||
+                (SYS_INT_SourceStatusGet(pDrvInstance->txInterruptSource)) ||
                 (SYS_INT_SourceStatusGet(pDrvInstance->errInterruptSource)))
             {
                 /* Interrupt would fire again anyway so we should just go back to the start*/
                 continueLoop = true;
                 continue;                            
             }
-            /* If we're here then we know that the interrupt should not be firing again so we can exit cleanly*/
-            /* Clear the interrupts now that we're done*/
-            /* Re-enable the interrupts*/
-            if (pDrvInstance->rxEnabled)
-            {
-                SYS_INT_SourceEnable(pDrvInstance->rxInterruptSource);
-            }
-            if (pDrvInstance->txEnabled)
-            {
-                SYS_INT_SourceEnable(pDrvInstance->txInterruptSource);
-            }
+            /* If we're here then we know that the interrupt should not be firing again immediately, so re-enable them and exit*/
+            SYS_INT_SourceEnable(pDrvInstance->rxInterruptSource);
+            SYS_INT_SourceEnable(pDrvInstance->txInterruptSource);
+
             return 0;            
         }
     
@@ -260,12 +257,14 @@ int32_t DRV_SPI_ISRMasterEBM8BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvInsta
 }
 int32_t DRV_SPI_ISRMasterRM8BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvInstance )    
 {
-    bool continueLoop;
+    volatile bool continueLoop;
+    
     /* Disable the interrupts */
     SYS_INT_SourceDisable(pDrvInstance->rxInterruptSource);
     SYS_INT_SourceDisable(pDrvInstance->txInterruptSource);
     SYS_INT_SourceDisable(pDrvInstance->errInterruptSource);
     do {
+        
         DRV_SPI_JOB_OBJECT * currentJob = pDrvInstance->currentJob;
         SPI_MODULE_ID spiId = pDrvInstance->spiId;
         /* Check for a new task */
@@ -273,7 +272,7 @@ int32_t DRV_SPI_ISRMasterRM8BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvInstan
         {
             if (DRV_SPI_SYS_QUEUE_Dequeue(pDrvInstance->queue, (void *)&(pDrvInstance->currentJob)) != DRV_SPI_SYS_QUEUE_SUCCESS)
             {
-                SYS_ASSERT(false, "SPI Driver: Error in dequeing");
+                SYS_ASSERT(false, "\r\nSPI Driver: Error in dequeing.");
                 return 0;       
             }
             if (pDrvInstance->currentJob == NULL)
@@ -354,24 +353,26 @@ int32_t DRV_SPI_ISRMasterRM8BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvInstan
                 
         continueLoop = false;
         /* Execute the sub tasks */
-        if 
+             if 
             (!txDMAInProgress &&
             (currentJob->dataLeftToTx +currentJob->dummyLeftToTx != 0)
             )
         {
             DRV_SPI_MasterRMSend8BitISR(pDrvInstance);
         }
+        
         DRV_SPI_ISRErrorTasks(pDrvInstance);
-    /* Figure out how many bytes are left to be received */
-    size_t bytesLeft = currentJob->dataLeftToRx + currentJob->dummyLeftToRx;
-    // Check to see if we have any data left to receive and update the bytes left.
-
+        
+        /* Figure out how many bytes are left to be received */
+        volatile size_t bytesLeft = currentJob->dataLeftToRx + currentJob->dummyLeftToRx;
+        // Check to see if we have any data left to receive and update the bytes left.
 
         if ((bytesLeft != 0) && !rxDMAInProgress)
         {
             DRV_SPI_MasterRMReceive8BitISR(pDrvInstance);
             bytesLeft = currentJob->dataLeftToRx + currentJob->dummyLeftToRx;
         }
+     
         if ((bytesLeft == 0) && !rxDMAInProgress && !txDMAInProgress)
         {
                     // Disable the interrupt, or more correctly don't re-enable it later*/
@@ -395,7 +396,7 @@ int32_t DRV_SPI_ISRMasterRM8BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvInstan
                     /* Return the job back to the free queue*/
                     if (DRV_SPI_SYS_QUEUE_FreeElement(pDrvInstance->queue, currentJob) != DRV_SPI_SYS_QUEUE_SUCCESS)
                     {
-                        SYS_ASSERT(false, "SPI Driver: Queue free element error");
+                        SYS_ASSERT(false, "\r\nSPI Driver: Queue free element error.");
                         return 0;
                     }
                     /* Clean up */
@@ -421,32 +422,25 @@ int32_t DRV_SPI_ISRMasterRM8BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvInstan
     
         /* Check to see if the interrupts would fire again if so just go back into 
            the loop instead of suffering the interrupt latency of exiting and re-entering*/
-        if (pDrvInstance->currentJob != NULL)
-        {
+        if ((pDrvInstance->currentJob != NULL) && !rxDMAInProgress && !txDMAInProgress)
+        {   
             /* Clear the Interrupts */
             SYS_INT_SourceStatusClear(pDrvInstance->rxInterruptSource);
             SYS_INT_SourceStatusClear(pDrvInstance->txInterruptSource);
             SYS_INT_SourceStatusClear(pDrvInstance->errInterruptSource);
             /* Interrupts should immediately become active again if they're in a fired condition */
-            if (((pDrvInstance->rxEnabled) && SYS_INT_SourceStatusGet(pDrvInstance->rxInterruptSource)) ||
-                ((pDrvInstance->txEnabled) && SYS_INT_SourceStatusGet(pDrvInstance->txInterruptSource)) ||
+            if ((SYS_INT_SourceStatusGet(pDrvInstance->rxInterruptSource)) ||
+                (SYS_INT_SourceStatusGet(pDrvInstance->txInterruptSource)) ||
                 (SYS_INT_SourceStatusGet(pDrvInstance->errInterruptSource)))
             {
                 /* Interrupt would fire again anyway so we should just go back to the start*/
                 continueLoop = true;
                 continue;                            
             }
-            /* If we're here then we know that the interrupt should not be firing again so we can exit cleanly*/
-            /* Clear the interrupts now that we're done*/
-            /* Re-enable the interrupts*/
-            if (pDrvInstance->rxEnabled)
-            {
-                SYS_INT_SourceEnable(pDrvInstance->rxInterruptSource);
-            }
-            if (pDrvInstance->txEnabled)
-            {
-                SYS_INT_SourceEnable(pDrvInstance->txInterruptSource);
-            }
+            /* If we're here then we know that the interrupt should not be firing again immediately, so re-enable them and exit*/
+            SYS_INT_SourceEnable(pDrvInstance->rxInterruptSource);
+            SYS_INT_SourceEnable(pDrvInstance->txInterruptSource);
+
             return 0;            
         }
     
@@ -458,8 +452,10 @@ int32_t DRV_SPI_ISRMasterRM8BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvInstan
 }
 int32_t DRV_SPI_PolledMasterEBM8BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvInstance )    
 {
-    bool continueLoop;
+    volatile bool continueLoop;
+    
     do {
+        
         DRV_SPI_JOB_OBJECT * currentJob = pDrvInstance->currentJob;
         SPI_MODULE_ID spiId = pDrvInstance->spiId;
         /* Check for a new task */
@@ -467,7 +463,7 @@ int32_t DRV_SPI_PolledMasterEBM8BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvIn
         {
             if (DRV_SPI_SYS_QUEUE_DequeueLock(pDrvInstance->queue, (void *)&(pDrvInstance->currentJob)) != DRV_SPI_SYS_QUEUE_SUCCESS)
             {
-                SYS_ASSERT(false, "SPI Driver: Error in dequeing");
+                SYS_ASSERT(false, "\r\nSPI Driver: Error in dequeing.");
                 return 0;       
             }
             if (pDrvInstance->currentJob == NULL)
@@ -547,24 +543,26 @@ int32_t DRV_SPI_PolledMasterEBM8BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvIn
                 
         continueLoop = false;
         /* Execute the sub tasks */
-        if 
+             if 
             (!txDMAInProgress &&
             (currentJob->dataLeftToTx +currentJob->dummyLeftToTx != 0)
             )
         {
             DRV_SPI_MasterEBMSend8BitPolled(pDrvInstance);
         }
+        
         DRV_SPI_PolledErrorTasks(pDrvInstance);
-    /* Figure out how many bytes are left to be received */
-    size_t bytesLeft = currentJob->dataLeftToRx + currentJob->dummyLeftToRx;
-    // Check to see if we have any data left to receive and update the bytes left.
-
+        
+        /* Figure out how many bytes are left to be received */
+        volatile size_t bytesLeft = currentJob->dataLeftToRx + currentJob->dummyLeftToRx;
+        // Check to see if we have any data left to receive and update the bytes left.
 
         if ((bytesLeft != 0) && !rxDMAInProgress)
         {
             DRV_SPI_MasterEBMReceive8BitPolled(pDrvInstance);
             bytesLeft = currentJob->dataLeftToRx + currentJob->dummyLeftToRx;
         }
+     
         if ((bytesLeft == 0) && !rxDMAInProgress && !txDMAInProgress)
         {
                     /* Job is complete*/
@@ -586,7 +584,7 @@ int32_t DRV_SPI_PolledMasterEBM8BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvIn
                     /* Return the job back to the free queue*/
                     if (DRV_SPI_SYS_QUEUE_FreeElementLock(pDrvInstance->queue, currentJob) != DRV_SPI_SYS_QUEUE_SUCCESS)
                     {
-                        SYS_ASSERT(false, "SPI Driver: Queue free element error");
+                        SYS_ASSERT(false, "\r\nSPI Driver: Queue free element error.");
                         return 0;
                     }
                     /* Clean up */
@@ -607,11 +605,13 @@ int32_t DRV_SPI_PolledMasterEBM8BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvIn
 }
 int32_t DRV_SPI_PolledMasterRM8BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvInstance )    
 {
-    bool continueLoop;
+    volatile bool continueLoop;
     uint8_t counter = 0;
     uint8_t numPolled = pDrvInstance->numTrfsSmPolled;
     uint8_t result = 0;
+    
     do {
+        
         DRV_SPI_JOB_OBJECT * currentJob = pDrvInstance->currentJob;
         SPI_MODULE_ID spiId = pDrvInstance->spiId;
         /* Check for a new task */
@@ -619,7 +619,7 @@ int32_t DRV_SPI_PolledMasterRM8BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvIns
         {
             if (DRV_SPI_SYS_QUEUE_DequeueLock(pDrvInstance->queue, (void *)&(pDrvInstance->currentJob)) != DRV_SPI_SYS_QUEUE_SUCCESS)
             {
-                SYS_ASSERT(false, "SPI Driver: Error in dequeing");
+                SYS_ASSERT(false, "\r\nSPI Driver: Error in dequeing.");
                 return 0;       
             }
             if (pDrvInstance->currentJob == NULL)
@@ -642,7 +642,7 @@ int32_t DRV_SPI_PolledMasterRM8BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvIns
                 PLIB_SPI_BaudRateSet( spiId , SYS_CLK_PeripheralFrequencyGet(pDrvInstance->spiClk), pClient->baudRate );
                 pDrvInstance->currentBaudRate = pClient->baudRate;
             }
-
+            
             /* List the new job as processing*/
             currentJob->status = DRV_SPI_BUFFER_EVENT_PROCESSING;
             /* Flush out the Receive buffer */
@@ -692,27 +692,29 @@ int32_t DRV_SPI_PolledMasterRM8BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvIns
         }
         bool rxDMAInProgress = (currentJob->rxDMAProgressStage == DRV_SPI_DMA_DATA_INPROGRESS) || (currentJob->rxDMAProgressStage == DRV_SPI_DMA_DUMMY_INPROGRESS);
         bool txDMAInProgress = (currentJob->txDMAProgressStage == DRV_SPI_DMA_DATA_INPROGRESS) || (currentJob->txDMAProgressStage == DRV_SPI_DMA_DUMMY_INPROGRESS);
-
+                
         continueLoop = false;
         /* Execute the sub tasks */
-        if 
+             if 
             (!txDMAInProgress &&
             (currentJob->dataLeftToTx +currentJob->dummyLeftToTx != 0)
             )
         {
             DRV_SPI_MasterRMSend8BitPolled(pDrvInstance);
         }
+        
         DRV_SPI_PolledErrorTasks(pDrvInstance);
-    /* Figure out how many bytes are left to be received */
-    size_t bytesLeft = currentJob->dataLeftToRx + currentJob->dummyLeftToRx;
-    // Check to see if we have any data left to receive and update the bytes left.
-
+        
+        /* Figure out how many bytes are left to be received */
+        volatile size_t bytesLeft = currentJob->dataLeftToRx + currentJob->dummyLeftToRx;
+        // Check to see if we have any data left to receive and update the bytes left.
 
         if ((bytesLeft != 0) && !rxDMAInProgress)
         {
             DRV_SPI_MasterRMReceive8BitPolled(pDrvInstance);
             bytesLeft = currentJob->dataLeftToRx + currentJob->dummyLeftToRx;
         }
+     
         if ((bytesLeft == 0) && !rxDMAInProgress && !txDMAInProgress)
         {
                     /* Job is complete*/
@@ -734,716 +736,7 @@ int32_t DRV_SPI_PolledMasterRM8BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvIns
                     /* Return the job back to the free queue*/
                     if (DRV_SPI_SYS_QUEUE_FreeElementLock(pDrvInstance->queue, currentJob) != DRV_SPI_SYS_QUEUE_SUCCESS)
                     {
-                        SYS_ASSERT(false, "SPI Driver: Queue free element error");
-                        return 0;
-                    }
-                    /* Clean up */
-                    pDrvInstance->currentJob = NULL;
-                }
-        else if (rxDMAInProgress)
-        {
-            // DMA is in progress
-            // Wipe out the symbols in Progress
-            pDrvInstance->rxEnabled = false;
-            pDrvInstance->symbolsInProgress = 0;
-        }
-
-    
-        counter ++;
-        if ((counter < numPolled) && (result != 0))
-{
-            continueLoop = true;
-        }
-
-    } while(continueLoop);
-    return 0;
-}
-
-
-int32_t DRV_SPI_ISRMasterEBM32BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvInstance )    
-{
-    bool continueLoop;
-    /* Disable the interrupts */
-    SYS_INT_SourceDisable(pDrvInstance->rxInterruptSource);
-    SYS_INT_SourceDisable(pDrvInstance->txInterruptSource);
-    SYS_INT_SourceDisable(pDrvInstance->errInterruptSource);
-    do {
-        DRV_SPI_JOB_OBJECT * currentJob = pDrvInstance->currentJob;
-        SPI_MODULE_ID spiId = pDrvInstance->spiId;
-        /* Check for a new task */
-        if (pDrvInstance->currentJob == NULL)
-        {
-            if (DRV_SPI_SYS_QUEUE_Dequeue(pDrvInstance->queue, (void *)&(pDrvInstance->currentJob)) != DRV_SPI_SYS_QUEUE_SUCCESS)
-            {
-                SYS_ASSERT(false, "SPI Driver: Error in dequeing");
-                return 0;       
-            }
-            if (pDrvInstance->currentJob == NULL)
-            {
-                pDrvInstance->txEnabled = false;
-                return 0;
-            }
-            currentJob = pDrvInstance->currentJob;
-
-            pDrvInstance->symbolsInProgress = 0;
-
-            /* Call the operation starting function pointer.  This can be used to modify the slave select lines */
-            DRV_SPI_CLIENT_OBJECT * pClient = (DRV_SPI_CLIENT_OBJECT*)currentJob->pClient;
-            if (pClient->operationStarting != NULL)
-            {
-                (*pClient->operationStarting)(DRV_SPI_BUFFER_EVENT_PROCESSING, (DRV_SPI_BUFFER_HANDLE)currentJob, currentJob->context);
-            }
-            /* Check the baud rate.  If its different set the new baud rate*/
-            if (pClient->baudRate != pDrvInstance->currentBaudRate)
-            {
-                PLIB_SPI_BaudRateSet( spiId , SYS_CLK_PeripheralFrequencyGet(pDrvInstance->spiClk), pClient->baudRate );
-                pDrvInstance->currentBaudRate = pClient->baudRate;
-            }
-            
-            /* List the new job as processing*/
-            currentJob->status = DRV_SPI_BUFFER_EVENT_PROCESSING;
-            if (currentJob->dataLeftToTx +currentJob->dummyLeftToTx > PLIB_SPI_RX_8BIT_FIFO_SIZE(spiId))
-            {
-                PLIB_SPI_FIFOInterruptModeSelect(spiId, SPI_FIFO_INTERRUPT_WHEN_TRANSMIT_BUFFER_IS_1HALF_EMPTY_OR_MORE);
-                PLIB_SPI_FIFOInterruptModeSelect(spiId, SPI_FIFO_INTERRUPT_WHEN_RECEIVE_BUFFER_IS_1HALF_FULL_OR_MORE);
-            }
-            /* Flush out the Receive buffer */
-            PLIB_SPI_BufferClear(spiId);
-        }
-
-        /* Set up DMA Receive job.  This is done here to ensure that the RX job is ready to receive when TXing starts*/
-        if ((pDrvInstance->rxDmaThreshold != 0) && (currentJob->dataLeftToRx > pDrvInstance->rxDmaThreshold))
-        {
-            PLIB_SPI_FIFOInterruptModeSelect(spiId, SPI_FIFO_INTERRUPT_WHEN_RECEIVE_BUFFER_IS_NOT_EMPTY);
-            uint8_t * ptr = &(currentJob->rxBuffer[currentJob->dataRxed]);
-            uint32_t len = MIN(MIN(PLIB_DMA_MAX_TRF_SIZE, DRV_SPI_DMA_TXFER_SIZE), currentJob->dataLeftToRx);
-            void * spiPtr = PLIB_SPI_BufferAddressGet(spiId);
-            currentJob->rxDMAProgressStage = DRV_SPI_DMA_DATA_INPROGRESS;
-            currentJob->dataLeftToRx -= len;
-            currentJob->dataRxed += len;
-            pDrvInstance->rxEnabled = false;
-            SYS_DMA_ChannelTransferAdd(pDrvInstance->rxDmaChannelHandle, spiPtr, 4, ptr, len, 4);
-        }
-        else if ((currentJob->rxDMAProgressStage == DRV_SPI_DMA_NONE) && (currentJob->dataLeftToRx == 0) && (pDrvInstance->rxDmaThreshold != 0) && (currentJob->dummyLeftToRx > pDrvInstance->rxDmaThreshold))
-        {
-            PLIB_SPI_FIFOInterruptModeSelect(spiId, SPI_FIFO_INTERRUPT_WHEN_RECEIVE_BUFFER_IS_NOT_EMPTY);
-            uint8_t * ptr = sDrvSpiRxDummy;
-            uint32_t len = MIN(MIN(MIN(PLIB_DMA_MAX_TRF_SIZE, DRV_SPI_DMA_DUMMY_BUFFER_SIZE), DRV_SPI_DMA_TXFER_SIZE), currentJob->dummyLeftToRx);
-            void * spiPtr = PLIB_SPI_BufferAddressGet(spiId);
-            currentJob->rxDMAProgressStage = DRV_SPI_DMA_DUMMY_INPROGRESS;
-            currentJob->dummyLeftToRx -= len;
-            pDrvInstance->rxEnabled = false;
-            SYS_DMA_ChannelTransferAdd(pDrvInstance->rxDmaChannelHandle, spiPtr, 4, ptr, len, 4);
-        }       
-        /* Set up the DMA Transmit job here.  This is done after the RX job to help prevent buffer overruns.*/
-        if ((pDrvInstance->txDmaThreshold != 0) && (currentJob->dataLeftToTx > pDrvInstance->txDmaThreshold))
-        {
-            PLIB_SPI_FIFOInterruptModeSelect(spiId, SPI_FIFO_INTERRUPT_WHEN_TRANSMIT_BUFFER_IS_NOT_FULL);
-            uint8_t * ptr = &(currentJob->txBuffer[currentJob->dataTxed]);
-            uint32_t len = MIN(MIN(PLIB_DMA_MAX_TRF_SIZE, DRV_SPI_DMA_TXFER_SIZE), currentJob->dataLeftToTx);
-            void * spiPtr = PLIB_SPI_BufferAddressGet(pDrvInstance->spiId);
-            currentJob->txDMAProgressStage = DRV_SPI_DMA_DATA_INPROGRESS;
-            currentJob->dataLeftToTx -= len;
-            currentJob->dataTxed += len;
-            pDrvInstance->txEnabled = false;
-            SYS_DMA_ChannelTransferAdd(pDrvInstance->txDmaChannelHandle, ptr, len, spiPtr, 4, 4);
-
-        }
-        else if ((currentJob->txDMAProgressStage == DRV_SPI_DMA_NONE) && (currentJob->dataLeftToTx == 0) && (pDrvInstance->txDmaThreshold != 0) && (currentJob->dummyLeftToTx > pDrvInstance->txDmaThreshold))
-        {
-            PLIB_SPI_FIFOInterruptModeSelect(spiId, SPI_FIFO_INTERRUPT_WHEN_TRANSMIT_BUFFER_IS_NOT_FULL);
-            uint8_t * ptr = sDrvSpiTxDummy;
-            uint32_t len = MIN(MIN(MIN(PLIB_DMA_MAX_TRF_SIZE, DRV_SPI_DMA_DUMMY_BUFFER_SIZE), DRV_SPI_DMA_TXFER_SIZE), currentJob->dummyLeftToTx);
-            void * spiPtr = PLIB_SPI_BufferAddressGet(pDrvInstance->spiId);
-            currentJob->txDMAProgressStage = DRV_SPI_DMA_DUMMY_INPROGRESS;
-            currentJob->dummyLeftToTx -= len;
-            pDrvInstance->txEnabled = false;
-            SYS_DMA_ChannelTransferAdd(pDrvInstance->txDmaChannelHandle, ptr, len, spiPtr, 4, 4);
-        }
-        bool rxDMAInProgress = (currentJob->rxDMAProgressStage == DRV_SPI_DMA_DATA_INPROGRESS) || (currentJob->rxDMAProgressStage == DRV_SPI_DMA_DUMMY_INPROGRESS);
-        bool txDMAInProgress = (currentJob->txDMAProgressStage == DRV_SPI_DMA_DATA_INPROGRESS) || (currentJob->txDMAProgressStage == DRV_SPI_DMA_DUMMY_INPROGRESS);
-                
-        continueLoop = false;
-        /* Execute the sub tasks */
-        if 
-            (!txDMAInProgress &&
-            (currentJob->dataLeftToTx +currentJob->dummyLeftToTx != 0)
-            )
-{
-            DRV_SPI_MasterEBMSend32BitISR(pDrvInstance);
-        }
-        DRV_SPI_ISRErrorTasks(pDrvInstance);
-    /* Figure out how many bytes are left to be received */
-    size_t bytesLeft = currentJob->dataLeftToRx + currentJob->dummyLeftToRx;
-    // Check to see if we have any data left to receive and update the bytes left.
-
-
-        if ((bytesLeft != 0) && !rxDMAInProgress)
-        {
-            DRV_SPI_MasterEBMReceive32BitISR(pDrvInstance);
-            bytesLeft = currentJob->dataLeftToRx + currentJob->dummyLeftToRx;
-        }
-        if ((bytesLeft == 0) && !rxDMAInProgress && !txDMAInProgress)
-            {
-                    // Disable the interrupt, or more correctly don't re-enable it later*/
-                    pDrvInstance->rxEnabled = false;
-                    /* Job is complete*/
-                    currentJob->status = DRV_SPI_BUFFER_EVENT_COMPLETE;
-                    /* Call the job complete call back*/
-                    if (currentJob->completeCB != NULL)
-                    {
-                        (*currentJob->completeCB)(DRV_SPI_BUFFER_EVENT_COMPLETE, (DRV_SPI_BUFFER_HANDLE)currentJob, currentJob->context);
-            }            
-                    /* Call the operation complete call back.  This is different than the
-                       job complete callback.  This can be used to modify the Slave Select line.
-                       The job complete callback can be used to free a client that is blocked 
-                       waiting for complete*/
-                    DRV_SPI_CLIENT_OBJECT * pClient = (DRV_SPI_CLIENT_OBJECT*)currentJob->pClient;
-                    if (pClient->operationEnded != NULL)
-            {
-                        (*pClient->operationEnded)(DRV_SPI_BUFFER_EVENT_COMPLETE, (DRV_SPI_BUFFER_HANDLE)currentJob, currentJob->context);
-                    }
-                    /* Return the job back to the free queue*/
-                    if (DRV_SPI_SYS_QUEUE_FreeElement(pDrvInstance->queue, currentJob) != DRV_SPI_SYS_QUEUE_SUCCESS)
-                    {
-                        SYS_ASSERT(false, "SPI Driver: Queue free element error");
-                        return 0;
-                    }
-                    /* Clean up */
-                    pDrvInstance->currentJob = NULL;
-                    if (!DRV_SPI_SYS_QUEUE_IsEmpty(pDrvInstance->queue))
-                    {
-                        continueLoop = true;    
-                        continue;
-                    }
-                    else
-                    {
-                break;
-            }
-                }
-        else if (rxDMAInProgress)
-            {
-            // DMA is in progress
-            // Wipe out the symbols in Progress
-            pDrvInstance->rxEnabled = false;
-            pDrvInstance->symbolsInProgress = 0;
-        }
-
-    
-        /* Check to see if the interrupts would fire again if so just go back into 
-           the loop instead of suffering the interrupt latency of exiting and re-entering*/
-        if (pDrvInstance->currentJob != NULL)
-        {
-            /* Clear the Interrupts */
-            SYS_INT_SourceStatusClear(pDrvInstance->rxInterruptSource);
-            SYS_INT_SourceStatusClear(pDrvInstance->txInterruptSource);
-            SYS_INT_SourceStatusClear(pDrvInstance->errInterruptSource);
-            /* Interrupts should immediately become active again if they're in a fired condition */
-            if (((pDrvInstance->rxEnabled) && SYS_INT_SourceStatusGet(pDrvInstance->rxInterruptSource)) ||
-                ((pDrvInstance->txEnabled) && SYS_INT_SourceStatusGet(pDrvInstance->txInterruptSource)) ||
-                (SYS_INT_SourceStatusGet(pDrvInstance->errInterruptSource)))
-            {
-                /* Interrupt would fire again anyway so we should just go back to the start*/
-                continueLoop = true;
-                continue;                            
-            }
-            /* If we're here then we know that the interrupt should not be firing again so we can exit cleanly*/
-            /* Clear the interrupts now that we're done*/
-            /* Re-enable the interrupts*/
-            if (pDrvInstance->rxEnabled)
-            {
-                SYS_INT_SourceEnable(pDrvInstance->rxInterruptSource);
-            }
-            if (pDrvInstance->txEnabled)
-            {
-                SYS_INT_SourceEnable(pDrvInstance->txInterruptSource);
-            }
-            return 0;            
-        }
-    
-    } while(continueLoop);
-    /* if we're here it means that we have no more jobs in the queue, tx and rx interrupts will be re-enabled by the BufferAdd* functions*/
-    SYS_INT_SourceStatusClear(pDrvInstance->rxInterruptSource);
-    SYS_INT_SourceStatusClear(pDrvInstance->txInterruptSource);
-    return 0;
-}
-int32_t DRV_SPI_ISRMasterRM32BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvInstance )    
-{
-    bool continueLoop;
-    /* Disable the interrupts */
-    SYS_INT_SourceDisable(pDrvInstance->rxInterruptSource);
-    SYS_INT_SourceDisable(pDrvInstance->txInterruptSource);
-    SYS_INT_SourceDisable(pDrvInstance->errInterruptSource);
-    do {
-        DRV_SPI_JOB_OBJECT * currentJob = pDrvInstance->currentJob;
-        SPI_MODULE_ID spiId = pDrvInstance->spiId;
-        /* Check for a new task */
-        if (pDrvInstance->currentJob == NULL)
-        {
-            if (DRV_SPI_SYS_QUEUE_Dequeue(pDrvInstance->queue, (void *)&(pDrvInstance->currentJob)) != DRV_SPI_SYS_QUEUE_SUCCESS)
-            {
-                SYS_ASSERT(false, "SPI Driver: Error in dequeing");
-                return 0;       
-            }
-            if (pDrvInstance->currentJob == NULL)
-            {
-                pDrvInstance->txEnabled = false;
-                return 0;
-            }
-            currentJob = pDrvInstance->currentJob;
-
-            pDrvInstance->symbolsInProgress = 0;
-
-            /* Call the operation starting function pointer.  This can be used to modify the slave select lines */
-            DRV_SPI_CLIENT_OBJECT * pClient = (DRV_SPI_CLIENT_OBJECT*)currentJob->pClient;
-            if (pClient->operationStarting != NULL)
-            {
-                (*pClient->operationStarting)(DRV_SPI_BUFFER_EVENT_PROCESSING, (DRV_SPI_BUFFER_HANDLE)currentJob, currentJob->context);
-            }
-            /* Check the baud rate.  If its different set the new baud rate*/
-            if (pClient->baudRate != pDrvInstance->currentBaudRate)
-            {
-                PLIB_SPI_BaudRateSet( spiId , SYS_CLK_PeripheralFrequencyGet(pDrvInstance->spiClk), pClient->baudRate );
-                pDrvInstance->currentBaudRate = pClient->baudRate;
-            }
-            
-            /* List the new job as processing*/
-            currentJob->status = DRV_SPI_BUFFER_EVENT_PROCESSING;
-            /* Flush out the Receive buffer */
-            PLIB_SPI_BufferClear(spiId);
-        }
-
-        /* Set up DMA Receive job.  This is done here to ensure that the RX job is ready to receive when TXing starts*/
-        if ((pDrvInstance->rxDmaThreshold != 0) && (currentJob->dataLeftToRx > pDrvInstance->rxDmaThreshold))
-        {
-            uint8_t * ptr = &(currentJob->rxBuffer[currentJob->dataRxed]);
-            uint32_t len = MIN(MIN(PLIB_DMA_MAX_TRF_SIZE, DRV_SPI_DMA_TXFER_SIZE), currentJob->dataLeftToRx);
-            void * spiPtr = PLIB_SPI_BufferAddressGet(spiId);
-            currentJob->rxDMAProgressStage = DRV_SPI_DMA_DATA_INPROGRESS;
-            currentJob->dataLeftToRx -= len;
-            currentJob->dataRxed += len;
-            pDrvInstance->rxEnabled = false;
-            SYS_DMA_ChannelTransferAdd(pDrvInstance->rxDmaChannelHandle, spiPtr, 4, ptr, len, 4);
-        }
-        else if ((currentJob->rxDMAProgressStage == DRV_SPI_DMA_NONE) && (currentJob->dataLeftToRx == 0) && (pDrvInstance->rxDmaThreshold != 0) && (currentJob->dummyLeftToRx > pDrvInstance->rxDmaThreshold))
-        {
-            uint8_t * ptr = sDrvSpiRxDummy;
-            uint32_t len = MIN(MIN(MIN(PLIB_DMA_MAX_TRF_SIZE, DRV_SPI_DMA_DUMMY_BUFFER_SIZE), DRV_SPI_DMA_TXFER_SIZE), currentJob->dummyLeftToRx);
-            void * spiPtr = PLIB_SPI_BufferAddressGet(spiId);
-            currentJob->rxDMAProgressStage = DRV_SPI_DMA_DUMMY_INPROGRESS;
-            currentJob->dummyLeftToRx -= len;
-            pDrvInstance->rxEnabled = false;
-            SYS_DMA_ChannelTransferAdd(pDrvInstance->rxDmaChannelHandle, spiPtr, 4, ptr, len, 4);
-        }       
-        /* Set up the DMA Transmit job here.  This is done after the RX job to help prevent buffer overruns.*/
-        if ((pDrvInstance->txDmaThreshold != 0) && (currentJob->dataLeftToTx > pDrvInstance->txDmaThreshold))
-        {
-            uint8_t * ptr = &(currentJob->txBuffer[currentJob->dataTxed]);
-            uint32_t len = MIN(MIN(PLIB_DMA_MAX_TRF_SIZE, DRV_SPI_DMA_TXFER_SIZE), currentJob->dataLeftToTx);
-            void * spiPtr = PLIB_SPI_BufferAddressGet(pDrvInstance->spiId);
-            currentJob->txDMAProgressStage = DRV_SPI_DMA_DATA_INPROGRESS;
-            currentJob->dataLeftToTx -= len;
-            currentJob->dataTxed += len;
-            pDrvInstance->txEnabled = false;
-            SYS_DMA_ChannelTransferAdd(pDrvInstance->txDmaChannelHandle, ptr, len, spiPtr, 4, 4);
-
-        }
-        else if ((currentJob->txDMAProgressStage == DRV_SPI_DMA_NONE) && (currentJob->dataLeftToTx == 0) && (pDrvInstance->txDmaThreshold != 0) && (currentJob->dummyLeftToTx > pDrvInstance->txDmaThreshold))
-        {
-            uint8_t * ptr = sDrvSpiTxDummy;
-            uint32_t len = MIN(MIN(MIN(PLIB_DMA_MAX_TRF_SIZE, DRV_SPI_DMA_DUMMY_BUFFER_SIZE), DRV_SPI_DMA_TXFER_SIZE), currentJob->dummyLeftToTx);
-            void * spiPtr = PLIB_SPI_BufferAddressGet(pDrvInstance->spiId);
-            currentJob->txDMAProgressStage = DRV_SPI_DMA_DUMMY_INPROGRESS;
-            currentJob->dummyLeftToTx -= len;
-            pDrvInstance->txEnabled = false;
-            SYS_DMA_ChannelTransferAdd(pDrvInstance->txDmaChannelHandle, ptr, len, spiPtr, 4, 4);
-        }
-        bool rxDMAInProgress = (currentJob->rxDMAProgressStage == DRV_SPI_DMA_DATA_INPROGRESS) || (currentJob->rxDMAProgressStage == DRV_SPI_DMA_DUMMY_INPROGRESS);
-        bool txDMAInProgress = (currentJob->txDMAProgressStage == DRV_SPI_DMA_DATA_INPROGRESS) || (currentJob->txDMAProgressStage == DRV_SPI_DMA_DUMMY_INPROGRESS);
-                
-        continueLoop = false;
-        /* Execute the sub tasks */
-        if 
-            (!txDMAInProgress &&
-            (currentJob->dataLeftToTx +currentJob->dummyLeftToTx != 0)
-            )
-        {
-            DRV_SPI_MasterRMSend32BitISR(pDrvInstance);
-        }
-        DRV_SPI_ISRErrorTasks(pDrvInstance);
-    /* Figure out how many bytes are left to be received */
-    size_t bytesLeft = currentJob->dataLeftToRx + currentJob->dummyLeftToRx;
-    // Check to see if we have any data left to receive and update the bytes left.
-
-
-        if ((bytesLeft != 0) && !rxDMAInProgress)
-        {
-            DRV_SPI_MasterRMReceive32BitISR(pDrvInstance);
-            bytesLeft = currentJob->dataLeftToRx + currentJob->dummyLeftToRx;
-        }
-        if ((bytesLeft == 0) && !rxDMAInProgress && !txDMAInProgress)
-        {
-                    // Disable the interrupt, or more correctly don't re-enable it later*/
-                    pDrvInstance->rxEnabled = false;
-                    /* Job is complete*/
-                    currentJob->status = DRV_SPI_BUFFER_EVENT_COMPLETE;
-                    /* Call the job complete call back*/
-                    if (currentJob->completeCB != NULL)
-                    {
-                        (*currentJob->completeCB)(DRV_SPI_BUFFER_EVENT_COMPLETE, (DRV_SPI_BUFFER_HANDLE)currentJob, currentJob->context);
-                    }
-                    /* Call the operation complete call back.  This is different than the
-                       job complete callback.  This can be used to modify the Slave Select line.
-                       The job complete callback can be used to free a client that is blocked 
-                       waiting for complete*/
-                    DRV_SPI_CLIENT_OBJECT * pClient = (DRV_SPI_CLIENT_OBJECT*)currentJob->pClient;
-                    if (pClient->operationEnded != NULL)
-                    {
-                        (*pClient->operationEnded)(DRV_SPI_BUFFER_EVENT_COMPLETE, (DRV_SPI_BUFFER_HANDLE)currentJob, currentJob->context);
-                    }
-                    /* Return the job back to the free queue*/
-                    if (DRV_SPI_SYS_QUEUE_FreeElement(pDrvInstance->queue, currentJob) != DRV_SPI_SYS_QUEUE_SUCCESS)
-                    {
-                        SYS_ASSERT(false, "SPI Driver: Queue free element error");
-                        return 0;
-                    }
-                    /* Clean up */
-                    pDrvInstance->currentJob = NULL;
-                    if (!DRV_SPI_SYS_QUEUE_IsEmpty(pDrvInstance->queue))
-                    {
-                        continueLoop = true;    
-                        continue;
-                    }
-                    else
-                    {
-                break;
-            }
-                }
-        else if (rxDMAInProgress)
-        {
-            // DMA is in progress
-            // Wipe out the symbols in Progress
-            pDrvInstance->rxEnabled = false;
-            pDrvInstance->symbolsInProgress = 0;
-        }
-
-    
-        /* Check to see if the interrupts would fire again if so just go back into 
-           the loop instead of suffering the interrupt latency of exiting and re-entering*/
-        if (pDrvInstance->currentJob != NULL)
-        {
-            /* Clear the Interrupts */
-            SYS_INT_SourceStatusClear(pDrvInstance->rxInterruptSource);
-            SYS_INT_SourceStatusClear(pDrvInstance->txInterruptSource);
-            SYS_INT_SourceStatusClear(pDrvInstance->errInterruptSource);
-            /* Interrupts should immediately become active again if they're in a fired condition */
-            if (((pDrvInstance->rxEnabled) && SYS_INT_SourceStatusGet(pDrvInstance->rxInterruptSource)) ||
-                ((pDrvInstance->txEnabled) && SYS_INT_SourceStatusGet(pDrvInstance->txInterruptSource)) ||
-                (SYS_INT_SourceStatusGet(pDrvInstance->errInterruptSource)))
-            {
-                /* Interrupt would fire again anyway so we should just go back to the start*/
-                continueLoop = true;
-                continue;                            
-            }
-            /* If we're here then we know that the interrupt should not be firing again so we can exit cleanly*/
-            /* Clear the interrupts now that we're done*/
-            /* Re-enable the interrupts*/
-            if (pDrvInstance->rxEnabled)
-            {
-                SYS_INT_SourceEnable(pDrvInstance->rxInterruptSource);
-            }
-            if (pDrvInstance->txEnabled)
-            {
-                SYS_INT_SourceEnable(pDrvInstance->txInterruptSource);
-            }
-            return 0;            
-        }
-    
-    } while(continueLoop);
-    /* if we're here it means that we have no more jobs in the queue, tx and rx interrupts will be re-enabled by the BufferAdd* functions*/
-    SYS_INT_SourceStatusClear(pDrvInstance->rxInterruptSource);
-    SYS_INT_SourceStatusClear(pDrvInstance->txInterruptSource);
-    return 0;
-}
-int32_t DRV_SPI_PolledMasterEBM32BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvInstance )    
-{
-    bool continueLoop;
-    do {
-        DRV_SPI_JOB_OBJECT * currentJob = pDrvInstance->currentJob;
-        SPI_MODULE_ID spiId = pDrvInstance->spiId;
-        /* Check for a new task */
-        if (pDrvInstance->currentJob == NULL)
-        {
-            if (DRV_SPI_SYS_QUEUE_DequeueLock(pDrvInstance->queue, (void *)&(pDrvInstance->currentJob)) != DRV_SPI_SYS_QUEUE_SUCCESS)
-            {
-                SYS_ASSERT(false, "SPI Driver: Error in dequeing");
-                return 0;       
-            }
-            if (pDrvInstance->currentJob == NULL)
-            {
-                return 0;
-            }
-            currentJob = pDrvInstance->currentJob;
-
-            pDrvInstance->symbolsInProgress = 0;
-
-            /* Call the operation starting function pointer.  This can be used to modify the slave select lines */
-            DRV_SPI_CLIENT_OBJECT * pClient = (DRV_SPI_CLIENT_OBJECT*)currentJob->pClient;
-            if (pClient->operationStarting != NULL)
-            {
-                (*pClient->operationStarting)(DRV_SPI_BUFFER_EVENT_PROCESSING, (DRV_SPI_BUFFER_HANDLE)currentJob, currentJob->context);
-            }
-            /* Check the baud rate.  If its different set the new baud rate*/
-            if (pClient->baudRate != pDrvInstance->currentBaudRate)
-            {
-                PLIB_SPI_BaudRateSet( spiId , SYS_CLK_PeripheralFrequencyGet(pDrvInstance->spiClk), pClient->baudRate );
-                pDrvInstance->currentBaudRate = pClient->baudRate;
-            }
-            
-            /* List the new job as processing*/
-            currentJob->status = DRV_SPI_BUFFER_EVENT_PROCESSING;
-            /* Flush out the Receive buffer */
-            PLIB_SPI_BufferClear(spiId);
-        }
-
-        /* Set up DMA Receive job.  This is done here to ensure that the RX job is ready to receive when TXing starts*/
-        if ((pDrvInstance->rxDmaThreshold != 0) && (currentJob->dataLeftToRx > pDrvInstance->rxDmaThreshold))
-        {
-            PLIB_SPI_FIFOInterruptModeSelect(spiId, SPI_FIFO_INTERRUPT_WHEN_RECEIVE_BUFFER_IS_NOT_EMPTY);
-            uint8_t * ptr = &(currentJob->rxBuffer[currentJob->dataRxed]);
-            uint32_t len = MIN(MIN(PLIB_DMA_MAX_TRF_SIZE, DRV_SPI_DMA_TXFER_SIZE), currentJob->dataLeftToRx);
-            void * spiPtr = PLIB_SPI_BufferAddressGet(spiId);
-            currentJob->rxDMAProgressStage = DRV_SPI_DMA_DATA_INPROGRESS;
-            currentJob->dataLeftToRx -= len;
-            currentJob->dataRxed += len;
-            SYS_DMA_ChannelTransferAdd(pDrvInstance->rxDmaChannelHandle, spiPtr, 4, ptr, len, 4);
-        }
-        else if ((currentJob->rxDMAProgressStage == DRV_SPI_DMA_NONE) && (currentJob->dataLeftToRx == 0) && (pDrvInstance->rxDmaThreshold != 0) && (currentJob->dummyLeftToRx > pDrvInstance->rxDmaThreshold))
-        {
-            PLIB_SPI_FIFOInterruptModeSelect(spiId, SPI_FIFO_INTERRUPT_WHEN_RECEIVE_BUFFER_IS_NOT_EMPTY);
-            uint8_t * ptr = sDrvSpiRxDummy;
-            uint32_t len = MIN(MIN(MIN(PLIB_DMA_MAX_TRF_SIZE, DRV_SPI_DMA_DUMMY_BUFFER_SIZE), DRV_SPI_DMA_TXFER_SIZE), currentJob->dummyLeftToRx);
-            void * spiPtr = PLIB_SPI_BufferAddressGet(spiId);
-            currentJob->rxDMAProgressStage = DRV_SPI_DMA_DUMMY_INPROGRESS;
-            currentJob->dummyLeftToRx -= len;
-            SYS_DMA_ChannelTransferAdd(pDrvInstance->rxDmaChannelHandle, spiPtr, 4, ptr, len, 4);
-        }       
-        /* Set up the DMA Transmit job here.  This is done after the RX job to help prevent buffer overruns.*/
-        if ((pDrvInstance->txDmaThreshold != 0) && (currentJob->dataLeftToTx > pDrvInstance->txDmaThreshold))
-        {
-            PLIB_SPI_FIFOInterruptModeSelect(spiId, SPI_FIFO_INTERRUPT_WHEN_TRANSMIT_BUFFER_IS_NOT_FULL);
-            uint8_t * ptr = &(currentJob->txBuffer[currentJob->dataTxed]);
-            uint32_t len = MIN(MIN(PLIB_DMA_MAX_TRF_SIZE, DRV_SPI_DMA_TXFER_SIZE), currentJob->dataLeftToTx);
-            void * spiPtr = PLIB_SPI_BufferAddressGet(pDrvInstance->spiId);
-            currentJob->txDMAProgressStage = DRV_SPI_DMA_DATA_INPROGRESS;
-            currentJob->dataLeftToTx -= len;
-            currentJob->dataTxed += len;
-            SYS_DMA_ChannelTransferAdd(pDrvInstance->txDmaChannelHandle, ptr, len, spiPtr, 4, 4);
-
-        }
-        else if ((currentJob->txDMAProgressStage == DRV_SPI_DMA_NONE) && (currentJob->dataLeftToTx == 0) && (pDrvInstance->txDmaThreshold != 0) && (currentJob->dummyLeftToTx > pDrvInstance->txDmaThreshold))
-        {
-            PLIB_SPI_FIFOInterruptModeSelect(spiId, SPI_FIFO_INTERRUPT_WHEN_TRANSMIT_BUFFER_IS_NOT_FULL);
-            uint8_t * ptr = sDrvSpiTxDummy;
-            uint32_t len = MIN(MIN(MIN(PLIB_DMA_MAX_TRF_SIZE, DRV_SPI_DMA_DUMMY_BUFFER_SIZE), DRV_SPI_DMA_TXFER_SIZE), currentJob->dummyLeftToTx);
-            void * spiPtr = PLIB_SPI_BufferAddressGet(pDrvInstance->spiId);
-            currentJob->txDMAProgressStage = DRV_SPI_DMA_DUMMY_INPROGRESS;
-            currentJob->dummyLeftToTx -= len;
-            SYS_DMA_ChannelTransferAdd(pDrvInstance->txDmaChannelHandle, ptr, len, spiPtr, 4, 4);
-        }
-        bool rxDMAInProgress = (currentJob->rxDMAProgressStage == DRV_SPI_DMA_DATA_INPROGRESS) || (currentJob->rxDMAProgressStage == DRV_SPI_DMA_DUMMY_INPROGRESS);
-        bool txDMAInProgress = (currentJob->txDMAProgressStage == DRV_SPI_DMA_DATA_INPROGRESS) || (currentJob->txDMAProgressStage == DRV_SPI_DMA_DUMMY_INPROGRESS);
-                
-        continueLoop = false;
-        /* Execute the sub tasks */
-        if 
-            (!txDMAInProgress &&
-            (currentJob->dataLeftToTx +currentJob->dummyLeftToTx != 0)
-            )
-        {
-            DRV_SPI_MasterEBMSend32BitPolled(pDrvInstance);
-        }
-        DRV_SPI_PolledErrorTasks(pDrvInstance);
-    /* Figure out how many bytes are left to be received */
-    size_t bytesLeft = currentJob->dataLeftToRx + currentJob->dummyLeftToRx;
-    // Check to see if we have any data left to receive and update the bytes left.
-
-
-        if ((bytesLeft != 0) && !rxDMAInProgress)
-        {
-            DRV_SPI_MasterEBMReceive32BitPolled(pDrvInstance);
-            bytesLeft = currentJob->dataLeftToRx + currentJob->dummyLeftToRx;
-        }
-        if ((bytesLeft == 0) && !rxDMAInProgress && !txDMAInProgress)
-        {
-                    /* Job is complete*/
-                    currentJob->status = DRV_SPI_BUFFER_EVENT_COMPLETE;
-                    /* Call the job complete call back*/
-                    if (currentJob->completeCB != NULL)
-                    {
-                        (*currentJob->completeCB)(DRV_SPI_BUFFER_EVENT_COMPLETE, (DRV_SPI_BUFFER_HANDLE)currentJob, currentJob->context);
-                    }
-                    /* Call the operation complete call back.  This is different than the
-                       job complete callback.  This can be used to modify the Slave Select line.
-                       The job complete callback can be used to free a client that is blocked 
-                       waiting for complete*/
-                    DRV_SPI_CLIENT_OBJECT * pClient = (DRV_SPI_CLIENT_OBJECT*)currentJob->pClient;
-                    if (pClient->operationEnded != NULL)
-                    {
-                        (*pClient->operationEnded)(DRV_SPI_BUFFER_EVENT_COMPLETE, (DRV_SPI_BUFFER_HANDLE)currentJob, currentJob->context);
-                    }
-                    /* Return the job back to the free queue*/
-                    if (DRV_SPI_SYS_QUEUE_FreeElementLock(pDrvInstance->queue, currentJob) != DRV_SPI_SYS_QUEUE_SUCCESS)
-                    {
-                        SYS_ASSERT(false, "SPI Driver: Queue free element error");
-                        return 0;
-                    }
-                    /* Clean up */
-                    pDrvInstance->currentJob = NULL;
-                }
-        else if (rxDMAInProgress)
-        {
-            // DMA is in progress
-            // Wipe out the symbols in Progress
-            pDrvInstance->rxEnabled = false;
-            pDrvInstance->symbolsInProgress = 0;
-        }
-
-    
-    
-    } while(continueLoop);
-    return 0;
-}
-int32_t DRV_SPI_PolledMasterRM32BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvInstance )    
-{
-    bool continueLoop;
-    uint8_t counter = 0;
-    uint8_t numPolled = pDrvInstance->numTrfsSmPolled;
-    uint8_t result = 0;
-    do {
-        DRV_SPI_JOB_OBJECT * currentJob = pDrvInstance->currentJob;
-        SPI_MODULE_ID spiId = pDrvInstance->spiId;
-        /* Check for a new task */
-        if (pDrvInstance->currentJob == NULL)
-        {
-            if (DRV_SPI_SYS_QUEUE_DequeueLock(pDrvInstance->queue, (void *)&(pDrvInstance->currentJob)) != DRV_SPI_SYS_QUEUE_SUCCESS)
-            {
-                SYS_ASSERT(false, "SPI Driver: Error in dequeing");
-                return 0;       
-            }
-            if (pDrvInstance->currentJob == NULL)
-            {
-                return 0;
-            }
-            currentJob = pDrvInstance->currentJob;
-
-            pDrvInstance->symbolsInProgress = 0;
-
-            /* Call the operation starting function pointer.  This can be used to modify the slave select lines */
-            DRV_SPI_CLIENT_OBJECT * pClient = (DRV_SPI_CLIENT_OBJECT*)currentJob->pClient;
-            if (pClient->operationStarting != NULL)
-            {
-                (*pClient->operationStarting)(DRV_SPI_BUFFER_EVENT_PROCESSING, (DRV_SPI_BUFFER_HANDLE)currentJob, currentJob->context);
-            }
-            /* Check the baud rate.  If its different set the new baud rate*/
-            if (pClient->baudRate != pDrvInstance->currentBaudRate)
-            {
-                PLIB_SPI_BaudRateSet( spiId , SYS_CLK_PeripheralFrequencyGet(pDrvInstance->spiClk), pClient->baudRate );
-                pDrvInstance->currentBaudRate = pClient->baudRate;
-            }
-            
-            /* List the new job as processing*/
-            currentJob->status = DRV_SPI_BUFFER_EVENT_PROCESSING;
-            /* Flush out the Receive buffer */
-            PLIB_SPI_BufferClear(spiId);
-        }
-
-        /* Set up DMA Receive job.  This is done here to ensure that the RX job is ready to receive when TXing starts*/
-        if ((pDrvInstance->rxDmaThreshold != 0) && (currentJob->dataLeftToRx > pDrvInstance->rxDmaThreshold))
-        {
-            uint8_t * ptr = &(currentJob->rxBuffer[currentJob->dataRxed]);
-            uint32_t len = MIN(MIN(PLIB_DMA_MAX_TRF_SIZE, DRV_SPI_DMA_TXFER_SIZE), currentJob->dataLeftToRx);
-            void * spiPtr = PLIB_SPI_BufferAddressGet(spiId);
-            currentJob->rxDMAProgressStage = DRV_SPI_DMA_DATA_INPROGRESS;
-            currentJob->dataLeftToRx -= len;
-            currentJob->dataRxed += len;
-            SYS_DMA_ChannelTransferAdd(pDrvInstance->rxDmaChannelHandle, spiPtr, 4, ptr, len, 4);
-        }
-        else if ((currentJob->rxDMAProgressStage == DRV_SPI_DMA_NONE) && (currentJob->dataLeftToRx == 0) && (pDrvInstance->rxDmaThreshold != 0) && (currentJob->dummyLeftToRx > pDrvInstance->rxDmaThreshold))
-        {
-            uint8_t * ptr = sDrvSpiRxDummy;
-            uint32_t len = MIN(MIN(MIN(PLIB_DMA_MAX_TRF_SIZE, DRV_SPI_DMA_DUMMY_BUFFER_SIZE), DRV_SPI_DMA_TXFER_SIZE), currentJob->dummyLeftToRx);
-            void * spiPtr = PLIB_SPI_BufferAddressGet(spiId);
-            currentJob->rxDMAProgressStage = DRV_SPI_DMA_DUMMY_INPROGRESS;
-            currentJob->dummyLeftToRx -= len;
-            SYS_DMA_ChannelTransferAdd(pDrvInstance->rxDmaChannelHandle, spiPtr, 4, ptr, len, 4);
-        }       
-        /* Set up the DMA Transmit job here.  This is done after the RX job to help prevent buffer overruns.*/
-        if ((pDrvInstance->txDmaThreshold != 0) && (currentJob->dataLeftToTx > pDrvInstance->txDmaThreshold))
-        {
-            uint8_t * ptr = &(currentJob->txBuffer[currentJob->dataTxed]);
-            uint32_t len = MIN(MIN(PLIB_DMA_MAX_TRF_SIZE, DRV_SPI_DMA_TXFER_SIZE), currentJob->dataLeftToTx);
-            void * spiPtr = PLIB_SPI_BufferAddressGet(pDrvInstance->spiId);
-            currentJob->txDMAProgressStage = DRV_SPI_DMA_DATA_INPROGRESS;
-            currentJob->dataLeftToTx -= len;
-            currentJob->dataTxed += len;
-            SYS_DMA_ChannelTransferAdd(pDrvInstance->txDmaChannelHandle, ptr, len, spiPtr, 4, 4);
-
-        }
-        else if ((currentJob->txDMAProgressStage == DRV_SPI_DMA_NONE) && (currentJob->dataLeftToTx == 0) && (pDrvInstance->txDmaThreshold != 0) && (currentJob->dummyLeftToTx > pDrvInstance->txDmaThreshold))
-        {
-            uint8_t * ptr = sDrvSpiTxDummy;
-            uint32_t len = MIN(MIN(MIN(PLIB_DMA_MAX_TRF_SIZE, DRV_SPI_DMA_DUMMY_BUFFER_SIZE), DRV_SPI_DMA_TXFER_SIZE), currentJob->dummyLeftToTx);
-            void * spiPtr = PLIB_SPI_BufferAddressGet(pDrvInstance->spiId);
-            currentJob->txDMAProgressStage = DRV_SPI_DMA_DUMMY_INPROGRESS;
-            currentJob->dummyLeftToTx -= len;
-            SYS_DMA_ChannelTransferAdd(pDrvInstance->txDmaChannelHandle, ptr, len, spiPtr, 4, 4);
-        }
-        bool rxDMAInProgress = (currentJob->rxDMAProgressStage == DRV_SPI_DMA_DATA_INPROGRESS) || (currentJob->rxDMAProgressStage == DRV_SPI_DMA_DUMMY_INPROGRESS);
-        bool txDMAInProgress = (currentJob->txDMAProgressStage == DRV_SPI_DMA_DATA_INPROGRESS) || (currentJob->txDMAProgressStage == DRV_SPI_DMA_DUMMY_INPROGRESS);
-                
-        continueLoop = false;
-        /* Execute the sub tasks */
-        if 
-            (!txDMAInProgress &&
-            (currentJob->dataLeftToTx +currentJob->dummyLeftToTx != 0)
-            )
-        {
-            DRV_SPI_MasterRMSend32BitPolled(pDrvInstance);
-        }
-        DRV_SPI_PolledErrorTasks(pDrvInstance);
-    /* Figure out how many bytes are left to be received */
-    size_t bytesLeft = currentJob->dataLeftToRx + currentJob->dummyLeftToRx;
-    // Check to see if we have any data left to receive and update the bytes left.
-
-
-        if ((bytesLeft != 0) && !rxDMAInProgress)
-        {
-            DRV_SPI_MasterRMReceive32BitPolled(pDrvInstance);
-            bytesLeft = currentJob->dataLeftToRx + currentJob->dummyLeftToRx;
-        }
-        if ((bytesLeft == 0) && !rxDMAInProgress && !txDMAInProgress)
-        {
-                    /* Job is complete*/
-                    currentJob->status = DRV_SPI_BUFFER_EVENT_COMPLETE;
-                    /* Call the job complete call back*/
-                    if (currentJob->completeCB != NULL)
-                    {
-                        (*currentJob->completeCB)(DRV_SPI_BUFFER_EVENT_COMPLETE, (DRV_SPI_BUFFER_HANDLE)currentJob, currentJob->context);
-                    }
-                    /* Call the operation complete call back.  This is different than the
-                       job complete callback.  This can be used to modify the Slave Select line.
-                       The job complete callback can be used to free a client that is blocked 
-                       waiting for complete*/
-                    DRV_SPI_CLIENT_OBJECT * pClient = (DRV_SPI_CLIENT_OBJECT*)currentJob->pClient;
-                    if (pClient->operationEnded != NULL)
-                    {
-                        (*pClient->operationEnded)(DRV_SPI_BUFFER_EVENT_COMPLETE, (DRV_SPI_BUFFER_HANDLE)currentJob, currentJob->context);
-                    }
-                    /* Return the job back to the free queue*/
-                    if (DRV_SPI_SYS_QUEUE_FreeElementLock(pDrvInstance->queue, currentJob) != DRV_SPI_SYS_QUEUE_SUCCESS)
-                    {
-                        SYS_ASSERT(false, "SPI Driver: Queue free element error");
+                        SYS_ASSERT(false, "\r\nSPI Driver: Queue free element error.");
                         return 0;
                     }
                     /* Clean up */
@@ -1467,6 +760,14 @@ int32_t DRV_SPI_PolledMasterRM32BitTasks ( struct DRV_SPI_DRIVER_OBJECT * pDrvIn
     } while(continueLoop);
     return 0;
 }
+
+
+    
+        
+
+
+            
+
 
 void DRV_SPI_SetupDMA( struct DRV_SPI_DRIVER_OBJECT * pDrvInstance)
 {
@@ -1476,29 +777,26 @@ void DRV_SPI_SetupDMA( struct DRV_SPI_DRIVER_OBJECT * pDrvInstance)
 
         switch(pDrvInstance->spiId)
         {
-            case SPI_ID_3:
-            {
-                txSource = DMA_TRIGGER_SPI_3_TRANSMIT;
-                rxSource = DMA_TRIGGER_SPI_3_RECEIVE;
-                break;
-            }    
             case SPI_ID_2:
             {
                 txSource = DMA_TRIGGER_SPI_2_TRANSMIT;
                 rxSource = DMA_TRIGGER_SPI_2_RECEIVE;
-                break;
-            }                  
+            }
+            break;
+            case SPI_ID_3:
+            {
+                txSource = DMA_TRIGGER_SPI_3_TRANSMIT;
+                rxSource = DMA_TRIGGER_SPI_3_RECEIVE;
+            }
+            break;
             case SPI_ID_4:
             {
                 txSource = DMA_TRIGGER_SPI_4_TRANSMIT;
                 rxSource = DMA_TRIGGER_SPI_4_RECEIVE;
-                break;
-            }                  
-            default:
-            {
-                while(true);
-                break;
             }
+            break;
+            default:
+               break;
         }
         if (pDrvInstance->txDmaThreshold != 0)
         {
