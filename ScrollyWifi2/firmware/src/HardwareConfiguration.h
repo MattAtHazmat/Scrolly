@@ -1,5 +1,5 @@
 /******************************************************************************/
-/* FirmwareConfiguration.h                                                    */
+/* HardwareConfiguration.h                                                    */
 /* Author: Matt Bennett                                                       */
 /* Created: March 19, 2015, 7:55 AM                                           */
 /******************************************************************************/
@@ -32,27 +32,44 @@
 /* USE OR OTHER DEALINGS IN THE SOFTWARE.                                     */
 /*                                                                            */
 /******************************************************************************/// </editor-fold>
-#ifndef FIRMWARE_CONFIGURATION_H
-#define FIRMWARE_CONFIGURATION_H
+#ifndef HARDWARE_CONFIGURATION_H
+#define HARDWARE_CONFIGURATION_H
 
-// *****************************************************************************
-// Section: Constants and Type Definitions.
-// *****************************************************************************
 
-#define STRIP_OUT_5V
-#define ACTIVITY_LED_INTERVAL   10000
-#define MAX_AMP                 (100)
-#define MIN_AMP                 (1)
-#define USE_APP_TASKS_ACTIVITY_OUTPUT
-#define DISPLAY_COLUMNS         (32)
-#define DISPLAY_ROWS            (8)
-#define UPDATE_MS               (10)
-#define HUE_INCREMENT           (1)
-#define INTENSITY               (0x0a)
-
-#define DISPLAY_SPI_DRIVER      DRV_SPI_INDEX_1
-#define DISPLAY_TIMER_DRIVER    DRV_TMR_INDEX_1
-
-//#define COLOR_TEST
-
-#endif    /* FIRMWARE_CONFIGURATION_H */
+#define TRIS_IN                 (1)
+#define TRIS_OUT                (0)
+//#define USE_ESK
+#define USE_WIFI_G_DEMO
+#if defined (USE_WIFI_G_DEMO)
+    #define LED_STRIP_OUT_DEFAULT   (true)
+    #define LED_STRIP_OUT           LATFbits.LATF5
+    #define LED_STRIP_DIRECTION     TRISFbits.TRISF5
+    #define LED_STRIP_ODC           ODCFbits.ODCF5
+#elif defined( USE_ESK)
+    #define USE_ACTIVITY_LED
+    #define ACTIVITY_LED            LATDbits.LATD0
+    #define ACTIVITY_LED_DIRECTION  TRISDbits.TRISD0
+    #define mActivityLEDInvert()    LATDINV=1<<_LATD_LATD0_POSITION
+    #define LED_STRIP_OUT_DEFAULT   (true)
+    #define LED_STRIP_OUT           LATGbits.LATG8
+    #define LED_STRIP_DIRECTION     TRISGbits.TRISG8
+    #define LED_STRIP_ODC           ODCGbits.ODCG8
+#else
+    #define ACTIVITY_LED            LATAbits.LATA3
+    #define ACTIVITY_LED_DIRECTION  TRISAbits.TRISA3
+    #define mActivityLEDInvert()    LATAINV=1<<_LATA_LATA3_POSITION
+    #define LED_STRIP_OUT_DEFAULT   (true)
+    #define LED_STRIP_OUT           LATGbits.LATG8
+    #define LED_STRIP_DIRECTION     TRISGbits.TRISG8
+    #define LED_STRIP_ODC           ODCGbits.ODCG8
+#endif
+#ifdef STRIP_OUT_5V
+    #define mStripOutConfigure()    LED_STRIP_OUT=LED_STRIP_OUT_DEFAULT; \
+                                    LED_STRIP_ODC=(true); \
+                                    LED_STRIP_DIRECTION=TRIS_OUT
+#else
+    #define mStripOutConfigure()    LED_STRIP_OUT=LED_STRIP_OUT_DEFAULT; \
+                                    LED_STRIP_ODC=(false); \
+                                    LED_STRIP_DIRECTION=TRIS_OUT
+#endif
+#endif    /* HARDWARE_CONFIGURATION_H */
