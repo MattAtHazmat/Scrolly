@@ -1,38 +1,4 @@
-# Object files
-*.o
-*.ko
-*.obj
-*.elf
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
-
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
-
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
-
-# Debug files
-*.dSYM/
-
-# from jnnewton, in Microchip Forums: http://www.microchip.com/forums/m790048.aspx
-
+*.bash
 *.d
 *.pre
 *.p1
@@ -42,18 +8,24 @@
 *.o
 *.sdb
 *.obj.dmp
-html/
-ScrollyWiFi/firmware/wifi_g_demo.X/nbproject/private/
-ScrollyWiFi/firmware/wifi_g_demo.X/nbproject/Package-*.bash
-ScrollyWiFi/firmware/wifi_g_demo.X/build/
-ScrollyWiFi/firmware/wifi_g_demo.X/nbbuild/
-ScrollyWiFi/firmware/wifi_g_demo.X/dist/
-ScrollyWiFi/firmware/wifi_g_demo.X/nbdist/
-ScrollyWiFi/firmware/wifi_g_demo.X/nbactions.xml
-ScrollyWiFi/firmware/wifi_g_demo.X/nb-configuration.xml
-ScrollyWiFi/firmware/wifi_g_demo.X/funclist
-ScrollyWiFi/firmware/wifi_g_demo.X/nbproject/Makefile-*
-ScrollyWiFi/firmware/wifi_g_demo.X/disassembly/
+*.mk
+*.properties
+*.bash
+*.jrl
+*.grctmp
+*.map
+*.elf
+*.properties
+
+MPLABXLog.xml
+MPLABXLog.xml.*
+private.xml
+
+*.X/nbproject/private/*
+*.X/build/*
+*.X/dist/*
+*.X/debug/*
+
 *.map
 
 private.h
